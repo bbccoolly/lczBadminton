@@ -18,6 +18,7 @@ interface BMApiService {
     fun login(@FieldMap map: Map<String, String>): Call<BaseUserEntity>
 
     //获取场地列表
+    @Headers("User-Agent:Dalvik/2.1.0 (Linux; U; Android 10; SM-G9860 Build/QP1A.190711.020)")
     @GET("field/list")
     fun getPlaceList(
         @HeaderMap headers: Map<String, String>,

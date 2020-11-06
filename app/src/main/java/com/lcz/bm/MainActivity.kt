@@ -14,6 +14,7 @@ import com.lcz.bm.api.BMApiService
 import com.lcz.bm.databinding.ActivityMainBinding
 import com.lcz.bm.entity.*
 import com.lcz.bm.util.RefreshStatusUtil
+import com.lcz.bm.util.SharedPreferenceStorage
 import okhttp3.MediaType
 import okhttp3.RequestBody
 import retrofit2.Call
@@ -29,14 +30,14 @@ class MainActivity : AppCompatActivity(), MainActionHandler,
     RefreshStatusUtil.OnRefreshStatusListener {
 
     private lateinit var binding: ActivityMainBinding
-    private var API_URL = "https://api.52jiayundong.com/"
-    private var mToken = ""
     private var gson: Gson? = null
     private lateinit var showMsgAdapter: ShowMsgAdapter
     private lateinit var smRecyclerView: RecyclerView
     private var msgArrays = ArrayList<ShowMsgEntity>()
     private var mRefreshStatusUtil: RefreshStatusUtil? = null
+    private val prefs = SharedPreferenceStorage(this)
 
+    private var mSelectPlaceData = "2020-11-08"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,7 +54,7 @@ class MainActivity : AppCompatActivity(), MainActionHandler,
         if (mRefreshStatusUtil == null) {
             mRefreshStatusUtil = RefreshStatusUtil(this, this)
         }
-        mRefreshStatusUtil?.start()
+//        mRefreshStatusUtil?.start()
     }
 
     private fun initRecyclerView() {
@@ -77,7 +78,7 @@ class MainActivity : AppCompatActivity(), MainActionHandler,
 
     @SuppressLint("ShowToast")
     override fun onActionLogin() {
-        getRepository(1)
+        getRepository(2)
     }
 
     private fun getRepository(type: Int) {
@@ -106,31 +107,36 @@ class MainActivity : AppCompatActivity(), MainActionHandler,
                     ) {
                         val result = response.body()
                         if (result != null && result.code == 900) {
-                            mToken = result.data.token
-                            Log.d("mToken 1 ", mToken)
-                            Log.d("onResponse1 ", "登录成功")
+                            prefs.token = result.data.token
+                            mHandler.sendEmptyMessage(SUCCESS_START_NET_LOGIN)
                         } else {
                             if (result != null) {
-                                Log.d("onResponse2 ", result.msg)
+                                val obtainMessage = mHandler.obtainMessage()
+                                obtainMessage.what = ERROR_NET_MSG
+                                obtainMessage.obj = result.msg
+                                mHandler.sendMessage(obtainMessage)
                             }
                         }
                     }
 
                     override fun onFailure(call: Call<BaseUserEntity>, t: Throwable) {
                         Log.d("onFailure ", t.message.toString())
+                        val obtainMessage = mHandler.obtainMessage()
+                        obtainMessage.what = ERROR_NET_MSG
+                        obtainMessage.obj = t.message.toString()
+                        mHandler.sendMessage(obtainMessage)
                     }
                 })
             }
             2 -> {
-                Log.d("mToken 2 ", mToken)
                 val placeList = bmApi.getPlaceList(
                     mapOf(
                         "api_version" to "5",
                         "platform" to "1",
-                        "token" to mToken
+                        "token" to prefs.token.toString()
                     ),
                     mapOf(
-                        "date" to "2020-11-08",
+                        "date" to mSelectPlaceData,
                         "sportId" to "4028f0ce5551abf3015551b0aae50001",
                         "departId" to "1418",
                     )
@@ -143,28 +149,35 @@ class MainActivity : AppCompatActivity(), MainActionHandler,
                         val result = response.body()
                         if (result != null && result.code == 900) {
                             Log.d("onResponse2 ", "获取场地成功 ")
+                            mHandler.sendEmptyMessage(SUCCESS_START_NET_FIELD_LIST)
                         } else {
                             if (result != null) {
-                                Log.d("onResponse2 ", result.msg)
+                                val obtainMessage = mHandler.obtainMessage()
+                                obtainMessage.what = ERROR_NET_MSG
+                                obtainMessage.obj = result.msg
+                                mHandler.sendMessage(obtainMessage)
                             }
                         }
                     }
 
                     override fun onFailure(call: Call<BasePlaceEntity>, t: Throwable) {
                         Log.d("onFailure ", t.message.toString())
+                        val obtainMessage = mHandler.obtainMessage()
+                        obtainMessage.what = ERROR_NET_MSG
+                        obtainMessage.obj = t.message.toString()
+                        mHandler.sendMessage(obtainMessage)
                     }
                 })
             }
             3 -> {
-                Log.d("mToken 3 ", mToken)
                 val checkSelect = bmApi.checkSelectPlace(
                     mapOf(
                         "api_version" to "5",
                         "platform" to "1",
-                        "token" to mToken
+                        "token" to prefs.token.toString()
                     ),
                     mapOf(
-                        "fieldDate" to "2020-11-08",
+                        "fieldDate" to mSelectPlaceData,
                         "fieldDetailIdsList" to "6679,6680",
                     )
                 )
@@ -176,60 +189,34 @@ class MainActivity : AppCompatActivity(), MainActionHandler,
                         val result = response.body()
                         if (result != null && result.code == 900) {
                             Log.d("onResponse3 ", "选择场次成功 ")
+                            mHandler.sendEmptyMessage(SUCCESS_START_NET_CHECK_SELECT)
                         } else {
                             if (result != null) {
-                                Log.d("onResponse2 ", result.msg)
+                                val obtainMessage = mHandler.obtainMessage()
+                                obtainMessage.what = ERROR_NET_MSG
+                                obtainMessage.obj = result.msg
+                                mHandler.sendMessage(obtainMessage)
                             }
                         }
                     }
 
                     override fun onFailure(call: Call<BaseCheckSelectEntity>, t: Throwable) {
                         Log.d("onFailure ", t.message.toString())
+                        val obtainMessage = mHandler.obtainMessage()
+                        obtainMessage.what = ERROR_NET_MSG
+                        obtainMessage.obj = t.message.toString()
+                        mHandler.sendMessage(obtainMessage)
                     }
                 })
             }
             4 -> {
-                Log.d("mToken 4 ", mToken)
-                var placeList = ArrayList<Fieldlist>()
-                var idList1 = ArrayList<String>()
-                idList1.add("6679")
-                var idList2 = ArrayList<String>()
-                idList2.add("6680")
-
-                var field1 = Fieldlist(
-                    id = "287",
-                    stime = "13:30",
-                    etime = "14:00",
-                    price = "45.00",
-                    priceidlist = idList1
-                )
-                var field2 = Fieldlist(
-                    id = "287",
-                    stime = "13:30",
-                    etime = "14:00",
-                    price = "45.00",
-                    priceidlist = idList2
-                )
-                placeList.add(field1)
-                placeList.add(field2)
-
-                var submitDataEntity = SubmitEntity(
-                    venueid = "1418",
-                    sportid = "4028f0ce5551abf3015551b0aae50001",
-                    ordertype = "2",
-                    fieldorder = Fieldorder(
-                        date = "2020-11-08",
-                        fieldlist = placeList
-                    )
-                )
-
                 val submitRetrofit = bmApi.submitOrder(
                     mapOf(
                         "api_version" to "5",
                         "platform" to "1",
-                        "token" to mToken
+                        "token" to prefs.token.toString()
                     ),
-                    map2Body(submitDataEntity)
+                    map2Body(getPlaceData())
                 )
                 submitRetrofit.enqueue(object : Callback<BaseSubmitEntity> {
                     override fun onResponse(
@@ -239,15 +226,23 @@ class MainActivity : AppCompatActivity(), MainActionHandler,
                         val result = response.body()
                         if (result != null && result.code == 900) {
                             Log.d("onResponse4 ", "订单提交成功 ")
+                            mHandler.sendEmptyMessage(SUCCESS_START_NET_SUBMIT_ORDER)
                         } else {
                             if (result != null) {
-                                Log.d("onResponse2 ", result.msg)
+                                val obtainMessage = mHandler.obtainMessage()
+                                obtainMessage.what = ERROR_NET_MSG
+                                obtainMessage.obj = result.msg
+                                mHandler.sendMessage(obtainMessage)
                             }
                         }
                     }
 
                     override fun onFailure(call: Call<BaseSubmitEntity>, t: Throwable) {
                         Log.d("onFailure ", t.message.toString())
+                        val obtainMessage = mHandler.obtainMessage()
+                        obtainMessage.what = ERROR_NET_MSG
+                        obtainMessage.obj = t.message.toString()
+                        mHandler.sendMessage(obtainMessage)
                     }
                 })
             }
@@ -255,21 +250,132 @@ class MainActivity : AppCompatActivity(), MainActionHandler,
 
     }
 
-    @SuppressLint("ShowToast")
-    override fun onActionGetListData() {
-        getRepository(2)
+    private fun getPlaceData(): SubmitEntity {
+        var placeList = ArrayList<Fieldlist>()
+        var idList31 = ArrayList<String>()
+        idList31.add("6396")
+        var idList32 = ArrayList<String>()
+        idList32.add("6397")
+        var idList33 = ArrayList<String>()
+        idList33.add("6398")
+        var idList34 = ArrayList<String>()
+        idList34.add("6399")
 
+        var idList41 = ArrayList<String>()
+        idList41.add("6423")
+        var idList42 = ArrayList<String>()
+        idList42.add("6424")
+        var idList43 = ArrayList<String>()
+        idList43.add("6425")
+        var idList44 = ArrayList<String>()
+        idList44.add("6426")
+
+        var field31 = Fieldlist(
+            id = "276",
+            stime = "20:00",
+            etime = "20:30",
+            price = "45.00",
+            priceidlist = idList31
+        )
+        var field32 = Fieldlist(
+            id = "276",
+            stime = "20:30",
+            etime = "21:00",
+            price = "45.00",
+            priceidlist = idList32
+        )
+        var field33 = Fieldlist(
+            id = "276",
+            stime = "21:00",
+            etime = "21:30",
+            price = "45.00",
+            priceidlist = idList33
+        )
+        var field34 = Fieldlist(
+            id = "276",
+            stime = "21:30",
+            etime = "22:00",
+            price = "45.00",
+            priceidlist = idList34
+        )
+
+        var field41 = Fieldlist(
+            id = "277",
+            stime = "20:00",
+            etime = "20:30",
+            price = "45.00",
+            priceidlist = idList41
+        )
+        var field42 = Fieldlist(
+            id = "277",
+            stime = "20:30",
+            etime = "21:00",
+            price = "45.00",
+            priceidlist = idList42
+        )
+        var field43 = Fieldlist(
+            id = "277",
+            stime = "21:00",
+            etime = "21:30",
+            price = "45.00",
+            priceidlist = idList43
+        )
+        var field44 = Fieldlist(
+            id = "277",
+            stime = "21:30",
+            etime = "22:00",
+            price = "45.00",
+            priceidlist = idList44
+        )
+
+        //3号场地 晚8点到10点
+        placeList.add(field31)
+        placeList.add(field32)
+        placeList.add(field33)
+        placeList.add(field34)
+        //4号场地 晚8点到10点
+        placeList.add(field41)
+        placeList.add(field42)
+        placeList.add(field43)
+        placeList.add(field44)
+
+        var submitDataEntity = SubmitEntity(
+            venueid = "1418",
+            sportid = "4028f0ce5551abf3015551b0aae50001",
+            ordertype = "2",
+            fieldorder = Fieldorder(
+                date = mSelectPlaceData,
+                fieldlist = placeList
+            )
+        )
+        return submitDataEntity
     }
 
-    @SuppressLint("ShowToast")
-    override fun onActionCheckSelect() {
-        getRepository(3)
+    override fun onActionTest() {
+        mHandler.sendEmptyMessage(IS_TEST)
     }
 
-    @SuppressLint("ShowToast")
-    override fun onActionSubmitOrder() {
-        getRepository(4)
+    @SuppressLint("SimpleDateFormat")
+    override fun onActionWeek2() {
+        mSelectPlaceData
+        val c = Calendar.getInstance()
+        c.add(Calendar.DAY_OF_MONTH, +1)
+        val time = c.time
+        mSelectPlaceData = SimpleDateFormat("yyyy-MM-dd").format(time)
+        Log.d("TAG", "S2--------$mSelectPlaceData")
+        binding.selectPlace = "要预定场地时间为：$mSelectPlaceData"
     }
+
+    @SuppressLint("SimpleDateFormat")
+    override fun onActionWeek5() {
+        val c = Calendar.getInstance()
+        c.add(Calendar.DAY_OF_MONTH, +4)
+        val time = c.time
+        mSelectPlaceData = SimpleDateFormat("MM-dd").format(time)
+        Log.d("TAG", "S5--------$mSelectPlaceData")
+        binding.selectPlace = "要预定场地时间为：$mSelectPlaceData"
+    }
+
 
     fun map2Body(`object`: Any): RequestBody {
         checkGson()
@@ -333,8 +439,26 @@ class MainActivity : AppCompatActivity(), MainActionHandler,
         object : Handler(Looper.getMainLooper()) {
             override fun handleMessage(msg: Message) {
                 when (msg.what) {
-                    0 -> {
+                    11 -> {
+                        refreshRecyclerViewData("登录成功")
+                        getRepository(2)
+                    }
+                    12 -> {
+                        refreshRecyclerViewData("获取场地列表成功")
+                        getRepository(3)
+                    }
+                    13 -> {
+                        refreshRecyclerViewData("选择场地成功")
+//                        getRepository(4)
+                    }
+                    14 -> {
+                        refreshRecyclerViewData("提交订单成功，请前往支付")
+                    }
+                    15 -> {
                         refreshRecyclerViewData("开始进行登录校验")
+                    }
+                    16 -> {
+                        refreshRecyclerViewData(msg.obj.toString())
                     }
                     1 -> {
                         refreshRecyclerViewData("当前时间：$mCurrentStringTime")
@@ -344,6 +468,9 @@ class MainActivity : AppCompatActivity(), MainActionHandler,
                     }
                     3 -> {
                         refreshRecyclerViewData("已超过开抢时间，请用其他软件预定场地")
+                    }
+                    4 -> {
+                        refreshRecyclerViewData(prefs.phone.toString())
                     }
                 }
             }
@@ -357,12 +484,19 @@ class MainActivity : AppCompatActivity(), MainActionHandler,
 
 
     companion object {
-        const val START_LOGIN = 0
+        const val SUCCESS_START_NET_LOGIN = 11
+        const val SUCCESS_START_NET_FIELD_LIST = 12
+        const val SUCCESS_START_NET_CHECK_SELECT = 13
+        const val SUCCESS_START_NET_SUBMIT_ORDER = 14
+        const val SUCCESS_START_NET_PAY = 15
+        const val ERROR_NET_MSG = 16
         const val LONG_TIME_REFRESH = 1
         const val START_REQUEST_NET = 2
         const val IS_NOT_MONDAY = 3
+        const val IS_TEST = 4
         const val TIME_STYLE = "yyyy-MM-dd HH:mm:ss"
         const val TIME_CURRENT = "yyyy-MM-dd"
+        const val API_URL = "https://api.52jiayundong.com/"
 
     }
 }

@@ -8,7 +8,7 @@ package com.lcz.bm
  */
 interface MainActionHandler {
     fun onActionLogin()
-    fun onActionGetListData()
-    fun onActionCheckSelect()
-    fun onActionSubmitOrder()
+    fun onActionTest()
+    fun onActionWeek2()
+    fun onActionWeek5()
 }
