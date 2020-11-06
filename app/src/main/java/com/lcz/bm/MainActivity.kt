@@ -78,7 +78,7 @@ class MainActivity : AppCompatActivity(), MainActionHandler,
 
     @SuppressLint("ShowToast")
     override fun onActionLogin() {
-        getRepository(2)
+        getRepository(1)
     }
 
     private fun getRepository(type: Int) {
@@ -251,47 +251,47 @@ class MainActivity : AppCompatActivity(), MainActionHandler,
     }
 
     private fun getPlaceData(): SubmitEntity {
-        var placeList = ArrayList<Fieldlist>()
-        var idList31 = ArrayList<String>()
+        val placeList = ArrayList<Fieldlist>()
+        val idList31 = ArrayList<String>()
         idList31.add("6396")
-        var idList32 = ArrayList<String>()
+        val idList32 = ArrayList<String>()
         idList32.add("6397")
-        var idList33 = ArrayList<String>()
+        val idList33 = ArrayList<String>()
         idList33.add("6398")
-        var idList34 = ArrayList<String>()
+        val idList34 = ArrayList<String>()
         idList34.add("6399")
 
-        var idList41 = ArrayList<String>()
+        val idList41 = ArrayList<String>()
         idList41.add("6423")
-        var idList42 = ArrayList<String>()
+        val idList42 = ArrayList<String>()
         idList42.add("6424")
-        var idList43 = ArrayList<String>()
+        val idList43 = ArrayList<String>()
         idList43.add("6425")
-        var idList44 = ArrayList<String>()
+        val idList44 = ArrayList<String>()
         idList44.add("6426")
 
-        var field31 = Fieldlist(
+        val field31 = Fieldlist(
             id = "276",
             stime = "20:00",
             etime = "20:30",
             price = "45.00",
             priceidlist = idList31
         )
-        var field32 = Fieldlist(
+        val field32 = Fieldlist(
             id = "276",
             stime = "20:30",
             etime = "21:00",
             price = "45.00",
             priceidlist = idList32
         )
-        var field33 = Fieldlist(
+        val field33 = Fieldlist(
             id = "276",
             stime = "21:00",
             etime = "21:30",
             price = "45.00",
             priceidlist = idList33
         )
-        var field34 = Fieldlist(
+        val field34 = Fieldlist(
             id = "276",
             stime = "21:30",
             etime = "22:00",
@@ -299,28 +299,28 @@ class MainActivity : AppCompatActivity(), MainActionHandler,
             priceidlist = idList34
         )
 
-        var field41 = Fieldlist(
+        val field41 = Fieldlist(
             id = "277",
             stime = "20:00",
             etime = "20:30",
             price = "45.00",
             priceidlist = idList41
         )
-        var field42 = Fieldlist(
+        val field42 = Fieldlist(
             id = "277",
             stime = "20:30",
             etime = "21:00",
             price = "45.00",
             priceidlist = idList42
         )
-        var field43 = Fieldlist(
+        val field43 = Fieldlist(
             id = "277",
             stime = "21:00",
             etime = "21:30",
             price = "45.00",
             priceidlist = idList43
         )
-        var field44 = Fieldlist(
+        val field44 = Fieldlist(
             id = "277",
             stime = "21:30",
             etime = "22:00",
@@ -449,7 +449,7 @@ class MainActivity : AppCompatActivity(), MainActionHandler,
                     }
                     13 -> {
                         refreshRecyclerViewData("选择场地成功")
-//                        getRepository(4)
+                        getRepository(4)
                     }
                     14 -> {
                         refreshRecyclerViewData("提交订单成功，请前往支付")
