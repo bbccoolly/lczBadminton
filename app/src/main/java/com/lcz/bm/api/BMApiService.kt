@@ -38,4 +38,12 @@ interface BMApiService {
         @HeaderMap headers: Map<String, String>,
         @Body body: RequestBody
     ): Call<BaseSubmitEntity>
+
+    //用于校验账号是否处于登录状态
+    @POST("order/list")
+    @FormUrlEncoded
+    fun getOrderList(
+        @HeaderMap headers: Map<String, String>,
+        @FieldMap map: Map<String, String>
+    ): Call<BaseEntity>
 }

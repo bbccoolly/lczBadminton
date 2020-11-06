@@ -78,7 +78,7 @@ class MainActivity : AppCompatActivity(), MainActionHandler,
 
     @SuppressLint("ShowToast")
     override fun onActionLogin() {
-        getRepository(1)
+        getRepository(5)
     }
 
     private fun getRepository(type: Int) {
@@ -238,6 +238,49 @@ class MainActivity : AppCompatActivity(), MainActionHandler,
                     }
 
                     override fun onFailure(call: Call<BaseSubmitEntity>, t: Throwable) {
+                        Log.d("onFailure ", t.message.toString())
+                        val obtainMessage = mHandler.obtainMessage()
+                        obtainMessage.what = ERROR_NET_MSG
+                        obtainMessage.obj = t.message.toString()
+                        mHandler.sendMessage(obtainMessage)
+                    }
+                })
+            }
+            5 -> {//用于校验 token 是否可用
+                val checkToken = bmApi.getOrderList(
+                    mapOf(
+                        "api_version" to "5",
+                        "platform" to "1",
+                        "token" to prefs.token.toString()
+                    ),
+                    mapOf(
+                        "status" to "0",
+                        "curPage" to "1"
+                    )
+                )
+                checkToken.enqueue(object : Callback<BaseEntity> {
+                    override fun onResponse(
+                        call: Call<BaseEntity>,
+                        response: Response<BaseEntity>
+                    ) {
+                        val result = response.body()
+                        if (result != null && result.code == 900) {
+                            Log.d("onResponse5 ", "token 可用")
+                            mHandler.sendEmptyMessage(SUCCESS_TOKEN_CHECK)
+                        } else {
+                            if (result != null) {
+                                if (result.code == 906) {
+                                    mHandler.sendEmptyMessage(SUCCESS_TOKEN_CHECK_ERROR)
+                                }
+                                val obtainMessage = mHandler.obtainMessage()
+                                obtainMessage.what = SUCCESS_TOKEN_CHECK_OTHER_ERROR
+                                obtainMessage.obj = result.msg
+                                mHandler.sendMessage(obtainMessage)
+                            }
+                        }
+                    }
+
+                    override fun onFailure(call: Call<BaseEntity>, t: Throwable) {
                         Log.d("onFailure ", t.message.toString())
                         val obtainMessage = mHandler.obtainMessage()
                         obtainMessage.what = ERROR_NET_MSG
@@ -460,6 +503,17 @@ class MainActivity : AppCompatActivity(), MainActionHandler,
                     16 -> {
                         refreshRecyclerViewData(msg.obj.toString())
                     }
+                    17 -> {
+                        refreshRecyclerViewData("token 可用,处于登录状态中")
+                        getRepository(2)
+                    }
+                    18 -> {
+                        refreshRecyclerViewData("token 失效正在重新登录")
+                        getRepository(1)
+                    }
+                    19 -> {
+                        refreshRecyclerViewData(msg.obj.toString())
+                    }
                     1 -> {
                         refreshRecyclerViewData("当前时间：$mCurrentStringTime")
                     }
@@ -490,6 +544,9 @@ class MainActivity : AppCompatActivity(), MainActionHandler,
         const val SUCCESS_START_NET_SUBMIT_ORDER = 14
         const val SUCCESS_START_NET_PAY = 15
         const val ERROR_NET_MSG = 16
+        const val SUCCESS_TOKEN_CHECK = 17
+        const val SUCCESS_TOKEN_CHECK_ERROR = 18
+        const val SUCCESS_TOKEN_CHECK_OTHER_ERROR = 19
         const val LONG_TIME_REFRESH = 1
         const val START_REQUEST_NET = 2
         const val IS_NOT_MONDAY = 3
