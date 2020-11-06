@@ -1,13 +1,10 @@
 package com.lcz.bm
 
 import android.annotation.SuppressLint
-import android.os.Bundle
-import android.os.CountDownTimer
+import android.os.*
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -16,7 +13,7 @@ import com.lcz.bm.adapter.ShowMsgAdapter
 import com.lcz.bm.api.BMApiService
 import com.lcz.bm.databinding.ActivityMainBinding
 import com.lcz.bm.entity.*
-import com.lcz.bm.util.Event
+import com.lcz.bm.util.RefreshStatusUtil
 import okhttp3.MediaType
 import okhttp3.RequestBody
 import retrofit2.Call
@@ -24,8 +21,12 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 
-class MainActivity : AppCompatActivity(), MainActionHandler {
+class MainActivity : AppCompatActivity(), MainActionHandler,
+    RefreshStatusUtil.OnRefreshStatusListener {
 
     private lateinit var binding: ActivityMainBinding
     private var API_URL = "https://api.52jiayundong.com/"
@@ -34,7 +35,7 @@ class MainActivity : AppCompatActivity(), MainActionHandler {
     private lateinit var showMsgAdapter: ShowMsgAdapter
     private lateinit var smRecyclerView: RecyclerView
     private var msgArrays = ArrayList<ShowMsgEntity>()
-    var countDownTimer: CountDownTimer? = null
+    private var mRefreshStatusUtil: RefreshStatusUtil? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,24 +43,17 @@ class MainActivity : AppCompatActivity(), MainActionHandler {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         binding.actionHandler = this
         smRecyclerView = binding.recycleViewTxt
+        initCurrentTime()
         initRecyclerView()
-        countDownTimer()
+        initHandlerTime()
+
     }
 
-    private fun countDownTimer() {
-        countDownTimer = object : CountDownTimer(60_000, 1000) {
-            override fun onTick(millisUntilFinished: Long) {
-                msgArrays.add(ShowMsgEntity("倒计时..." + millisUntilFinished / 1000))
-                showMsgAdapter.notifyDataSetChanged()
-                smRecyclerView.layoutManager?.smoothScrollToPosition(smRecyclerView,null,showMsgAdapter.itemCount-1)
-            }
-
-            override fun onFinish() {
-
-            }
-
+    private fun initHandlerTime() {
+        if (mRefreshStatusUtil == null) {
+            mRefreshStatusUtil = RefreshStatusUtil(this, this)
         }
-        countDownTimer?.start()
+        mRefreshStatusUtil?.start()
     }
 
     private fun initRecyclerView() {
@@ -295,4 +289,80 @@ class MainActivity : AppCompatActivity(), MainActionHandler {
         }
     }
 
+    private fun refreshRecyclerViewData(msg: String) {
+        if (!smRecyclerView.isComputingLayout) {
+            msgArrays.add(ShowMsgEntity(msg))
+            showMsgAdapter.notifyDataSetChanged()
+            smRecyclerView.layoutManager?.smoothScrollToPosition(
+                smRecyclerView,
+                null,
+                showMsgAdapter.itemCount - 1
+            )
+        }
+    }
+
+    private var mSelectTime = ""
+    private var mCurrentStringTime = ""
+
+    @SuppressLint("SimpleDateFormat")
+    override fun onRefreshStatus() {
+//        if (!isMonDay()) {
+//            mHandler.sendEmptyMessage(IS_NOT_MONDAY)
+//            mRefreshStatusUtil?.release()
+//            return
+//        }
+        val mSDF = SimpleDateFormat(TIME_STYLE)
+        mCurrentStringTime = mSDF.format(System.currentTimeMillis())
+        val mCurrentData = mSDF.parse(mCurrentStringTime)
+        val mSelectData = mSDF.parse(mSelectTime)
+        if (mCurrentData.time > mSelectData.time) {
+            mHandler.sendEmptyMessage(START_REQUEST_NET)
+            mRefreshStatusUtil?.release()
+        } else {
+            mHandler.sendEmptyMessage(LONG_TIME_REFRESH)
+        }
+    }
+
+    private fun isMonDay(): Boolean {
+        val c = Calendar.getInstance()
+        c.timeZone = TimeZone.getTimeZone("GMT+8:00")
+        return c.get(Calendar.DAY_OF_WEEK) == 2
+    }
+
+    private val mHandler: Handler =
+        object : Handler(Looper.getMainLooper()) {
+            override fun handleMessage(msg: Message) {
+                when (msg.what) {
+                    0 -> {
+                        refreshRecyclerViewData("开始进行登录校验")
+                    }
+                    1 -> {
+                        refreshRecyclerViewData("当前时间：$mCurrentStringTime")
+                    }
+                    2 -> {
+                        refreshRecyclerViewData("开始请求网络")
+                    }
+                    3 -> {
+                        refreshRecyclerViewData("已超过开抢时间，请用其他软件预定场地")
+                    }
+                }
+            }
+        }
+
+    private fun initCurrentTime() {
+        val mSDF = SimpleDateFormat(TIME_CURRENT)
+        mSelectTime = mSDF.format(System.currentTimeMillis()) + " 18:00:00"
+        binding.selectTime = "开始订场时间：$mSelectTime"
+    }
+
+
+    companion object {
+        const val START_LOGIN = 0
+        const val LONG_TIME_REFRESH = 1
+        const val START_REQUEST_NET = 2
+        const val IS_NOT_MONDAY = 3
+        const val TIME_STYLE = "yyyy-MM-dd HH:mm:ss"
+        const val TIME_CURRENT = "yyyy-MM-dd"
+
+    }
 }
