@@ -2,13 +2,21 @@ package com.lcz.bm
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
+import com.lcz.bm.adapter.ShowMsgAdapter
 import com.lcz.bm.api.BMApiService
 import com.lcz.bm.databinding.ActivityMainBinding
 import com.lcz.bm.entity.*
+import com.lcz.bm.util.Event
 import okhttp3.MediaType
 import okhttp3.RequestBody
 import retrofit2.Call
@@ -23,12 +31,54 @@ class MainActivity : AppCompatActivity(), MainActionHandler {
     private var API_URL = "https://api.52jiayundong.com/"
     private var mToken = ""
     private var gson: Gson? = null
+    private lateinit var showMsgAdapter: ShowMsgAdapter
+    private lateinit var smRecyclerView: RecyclerView
+    private var msgArrays = ArrayList<ShowMsgEntity>()
+    var countDownTimer: CountDownTimer? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         binding.actionHandler = this
+        smRecyclerView = binding.recycleViewTxt
+        initRecyclerView()
+        countDownTimer()
+    }
+
+    private fun countDownTimer() {
+        countDownTimer = object : CountDownTimer(60_000, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                msgArrays.add(ShowMsgEntity("倒计时..." + millisUntilFinished / 1000))
+                showMsgAdapter.notifyDataSetChanged()
+                smRecyclerView.layoutManager?.smoothScrollToPosition(smRecyclerView,null,showMsgAdapter.itemCount-1)
+            }
+
+            override fun onFinish() {
+
+            }
+
+        }
+        countDownTimer?.start()
+    }
+
+    private fun initRecyclerView() {
+        val linearLayoutManager = LinearLayoutManager(this)
+        linearLayoutManager.stackFromEnd = true
+        linearLayoutManager.reverseLayout = true
+        showMsgAdapter = ShowMsgAdapter(this)
+        smRecyclerView.apply {
+//            layoutManager = linearLayoutManager
+            adapter = showMsgAdapter
+            (itemAnimator as DefaultItemAnimator).run {
+                supportsChangeAnimations = false
+                addDuration = 160L
+                moveDuration = 160L
+                changeDuration = 160L
+                removeDuration = 120L
+            }
+        }
+        showMsgAdapter.submitList(msgArrays)
     }
 
     @SuppressLint("ShowToast")
