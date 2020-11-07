@@ -13,12 +13,13 @@ import retrofit2.http.*
  */
 interface BMApiService {
 
+    @Headers("User-Agent:Mozilla/5.0 (Linux; U; Android 8.1.0; zh-cn; BLA-AL00 Build/HUAWEIBLA-AL00)")
     @POST("user/login")
     @FormUrlEncoded
     fun login(@FieldMap map: Map<String, String>): Call<BaseUserEntity>
 
     //获取场地列表
-    @Headers("User-Agent:Dalvik/2.1.0 (Linux; U; Android 10; SM-G9860 Build/QP1A.190711.020)")
+    @Headers("User-Agent:Mozilla/5.0 (Linux; U; Android 8.1.0; zh-cn; BLA-AL00 Build/HUAWEIBLA-AL00)")
     @GET("field/list")
     fun getPlaceList(
         @HeaderMap headers: Map<String, String>,
@@ -26,6 +27,7 @@ interface BMApiService {
     ): Call<BasePlaceEntity>
 
     //校验场地
+    @Headers("User-Agent:Mozilla/5.0 (Linux; U; Android 8.1.0; zh-cn; BLA-AL00 Build/HUAWEIBLA-AL00)")
     @GET("order/check/orderLimit")
     fun checkSelectPlace(
         @HeaderMap headers: Map<String, String>,
@@ -33,6 +35,7 @@ interface BMApiService {
     ): Call<BaseCheckSelectEntity>
 
     //提交订单
+    @Headers("User-Agent:Mozilla/5.0 (Linux; U; Android 8.1.0; zh-cn; BLA-AL00 Build/HUAWEIBLA-AL00)")
     @POST("order/place")
     fun submitOrder(
         @HeaderMap headers: Map<String, String>,
@@ -40,6 +43,7 @@ interface BMApiService {
     ): Call<BaseSubmitEntity>
 
     //用于校验账号是否处于登录状态
+    @Headers("User-Agent:Mozilla/5.0 (Linux; U; Android 8.1.0; zh-cn; BLA-AL00 Build/HUAWEIBLA-AL00)")
     @POST("order/list")
     @FormUrlEncoded
     fun getOrderList(
