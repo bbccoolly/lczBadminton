@@ -1,5 +1,7 @@
 package com.lcz.bm.entity
 
+import java.io.Serializable
+
 /**
  *
  * desc: TODO
@@ -11,12 +13,12 @@ data class SubmitEntity(
     val ordertype: String,
     val sportid: String,
     val venueid: String
-)
+) : Serializable
 
 data class Fieldorder(
     val date: String,
     val fieldlist: ArrayList<Fieldlist>
-)
+) : Serializable
 
 data class Fieldlist(
     val etime: String,
@@ -24,4 +26,4 @@ data class Fieldlist(
     val price: String,
     val priceidlist: ArrayList<String>,
     val stime: String
-)
+) : Serializable

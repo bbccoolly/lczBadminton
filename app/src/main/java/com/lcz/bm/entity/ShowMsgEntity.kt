@@ -1,5 +1,7 @@
 package com.lcz.bm.entity
 
+import java.io.Serializable
+
 /**
  *
  * desc: TODO
@@ -8,4 +10,4 @@ package com.lcz.bm.entity
  */
 data class ShowMsgEntity(
     var showMsg: String
-)
+) : Serializable

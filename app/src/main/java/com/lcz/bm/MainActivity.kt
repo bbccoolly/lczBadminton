@@ -426,6 +426,7 @@ class MainActivity : AppCompatActivity(), MainActionHandler,
     }
 
     override fun onActionClear() {
+        getRepository(5)
     }
 
 

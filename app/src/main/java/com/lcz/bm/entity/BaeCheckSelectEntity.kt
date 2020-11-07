@@ -1,5 +1,7 @@
 package com.lcz.bm.entity
 
+import java.io.Serializable
+
 /**
  *
  * desc: TODO
@@ -13,11 +15,11 @@ data class BaseCheckSelectEntity(
     val msg: String,
     val pagenum: Any,
     val total: Any
-)
+) : Serializable
 
 data class CSData(
     val canOrder: Boolean,
     val fieldHours: String,
     val fieldMaxHours: String,
     val orderHours: String
-)
+) : Serializable
