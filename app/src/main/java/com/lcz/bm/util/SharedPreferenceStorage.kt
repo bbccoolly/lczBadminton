@@ -32,7 +32,7 @@ class SharedPreferenceStorage(context: Context) : PreferenceStorage {
         }
     }
 
-    private val changeListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+    private val changeListener = SharedPreferences.OnSharedPreferenceChangeListener { _, _ ->
     }
 
     override var phone: String? by StringPreference(

@@ -166,7 +166,7 @@ class MainActivity : AppCompatActivity(), MainActionHandler,
                     mapOf(
                         "date" to mSelectPlaceData,
                         "sportId" to "4028f0ce5551abf3015551b0aae50001",
-                        "departId" to "1418",
+                        "departId" to "1418"
                     )
                 )
                 placeList.enqueue(object : Callback<BasePlaceEntity> {
@@ -206,7 +206,7 @@ class MainActivity : AppCompatActivity(), MainActionHandler,
                     ),
                     mapOf(
                         "fieldDate" to mSelectPlaceData,
-                        "fieldDetailIdsList" to "6679,6680",
+                        "fieldDetailIdsList" to "6679,6680"
                     )
                 )
                 checkSelect.enqueue(object : Callback<BaseCheckSelectEntity> {
@@ -492,13 +492,15 @@ class MainActivity : AppCompatActivity(), MainActionHandler,
     override fun onRefreshStatus() {
         val mSDF = SimpleDateFormat(TIME_STYLE)
         mCurrentStringTime = mSDF.format(System.currentTimeMillis())
-        val mCurrentData = mSDF.parse(mCurrentStringTime)
-        val mSelectData = mSDF.parse(mSelectTime)
-        if (mCurrentData.time > mSelectData.time) {
-            mHandler.sendEmptyMessage(START_REQUEST_NET)
-            mRefreshStatusUtil?.release()
-        } else {
-            mHandler.sendEmptyMessage(LONG_TIME_REFRESH)
+        val mCurrentData: Date? = mSDF.parse(mCurrentStringTime)
+        val mSelectData: Date? = mSDF.parse(mSelectTime)
+        if (mCurrentData != null && mSelectData != null) {
+            if (mCurrentData.time > mSelectData.time) {
+                mHandler.sendEmptyMessage(START_REQUEST_NET)
+                mRefreshStatusUtil?.release()
+            } else {
+                mHandler.sendEmptyMessage(LONG_TIME_REFRESH)
+            }
         }
     }
 
