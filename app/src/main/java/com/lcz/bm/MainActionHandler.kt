@@ -13,4 +13,7 @@ interface MainActionHandler {
     fun onActionCBZ5(checked: Boolean)
     fun onActionCBAutoSubmit(checked: Boolean)
     fun onActionCBAutoStart(checked: Boolean)
+
+    fun onActionAddLog()
+    fun onActionGetLog()
 }

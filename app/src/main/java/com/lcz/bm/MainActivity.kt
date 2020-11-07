@@ -14,10 +14,15 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
 import com.lcz.bm.adapter.ShowMsgAdapter
 import com.lcz.bm.api.BMApiService
+import com.lcz.bm.data.LogEntity
+import com.lcz.bm.data.LoggerDataSource
 import com.lcz.bm.databinding.ActivityMainBinding
+import com.lcz.bm.di.InMemoryLogger
 import com.lcz.bm.entity.*
+import com.lcz.bm.util.DateFormatterUtil
 import com.lcz.bm.util.RefreshStatusUtil
 import com.lcz.bm.util.SharedPreferenceStorage
+import dagger.hilt.android.AndroidEntryPoint
 import okhttp3.MediaType
 import okhttp3.RequestBody
 import retrofit2.Call
@@ -27,10 +32,20 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.text.SimpleDateFormat
 import java.util.*
+import javax.inject.Inject
 import kotlin.collections.ArrayList
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity(), MainActionHandler,
     RefreshStatusUtil.OnRefreshStatusListener {
+
+    @InMemoryLogger
+    @Inject
+    lateinit var logger: LoggerDataSource
+
+    @Inject
+    lateinit var dateFormatter: DateFormatterUtil
+
 
     private lateinit var binding: ActivityMainBinding
     private var gson: Gson? = null
@@ -452,6 +467,22 @@ class MainActivity : AppCompatActivity(), MainActionHandler,
             mRefreshStatusUtil?.release()
         }
         updateCheckBoxAutoStart()
+    }
+
+    override fun onActionAddLog() {
+        logger.addLog("onActionAddLog - ")
+    }
+
+    override fun onActionGetLog() {
+        logger.getAllLogs { logs ->
+            val logs1: List<LogEntity> = logs
+            for (i in 0..logs1.size - 1) {
+                Log.d(
+                    "TAG",
+                    logs1[i].msg + "----------" + dateFormatter.formatDate(logs1[i].timestamp)
+                )
+            }
+        }
     }
 
 
