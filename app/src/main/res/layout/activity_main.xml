@@ -12,9 +12,21 @@
         <variable
             name="selectTime"
             type="String" />
+
         <variable
             name="selectPlace"
             type="String" />
+
+        <variable
+            name="isSelectZ2"
+            type="Boolean" />
+
+        <variable
+            name="isAutoSubmit"
+            type="Boolean" />
+        <variable
+            name="isAutoStart"
+            type="Boolean" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -29,19 +41,19 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginLeft="8dp"
-            android:onClick="@{()->actionHandler.onActionLogin()}"
-            android:text="登录"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginTop="8dp"
+            android:onClick="@{()->actionHandler.onActionStart()}"
+            android:text="开始"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/button3" />
+            app:layout_constraintTop_toBottomOf="@+id/checkBox4" />
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/materialCardView"
             android:layout_width="match_parent"
-            android:layout_height="300dp"
-            android:layout_marginTop="16dp"
+            android:layout_height="150dp"
+            android:layout_marginTop="8dp"
             app:cardBackgroundColor="#00BCD4"
-            app:layout_constraintTop_toBottomOf="@+id/textView3">
+            app:layout_constraintTop_toBottomOf="@+id/button">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recycleViewTxt"
@@ -59,60 +71,79 @@
             android:id="@+id/textView2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
             android:text="@{selectTime}"
-            android:textSize="16sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <Button
-            android:onClick="@{()->actionHandler.onActionTest()}"
-            android:id="@+id/button2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp"
-            android:text="Test"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/materialCardView" />
+            android:textSize="14sp"
+            android:textColor="@color/teal_200"
+            app:layout_constraintBottom_toBottomOf="@+id/checkBox4"
+            app:layout_constraintStart_toEndOf="@+id/checkBox4"
+            app:layout_constraintTop_toTopOf="@+id/checkBox4" />
 
         <TextView
             android:id="@+id/textView3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="8dp"
             android:text="@{selectPlace}"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView2" />
+            app:layout_constraintBottom_toBottomOf="@+id/button"
+            app:layout_constraintStart_toEndOf="@+id/button"
+            app:layout_constraintTop_toTopOf="@+id/button" />
 
-        <Button
-            android:id="@+id/button3"
+        <CheckBox
+            android:id="@+id/checkBox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginLeft="8dp"
             android:layout_marginTop="8dp"
-            android:text="周二晚场地"
-            android:onClick="@{()->actionHandler.onActionWeek2()}"
+            android:checked="@{isSelectZ2}"
+            android:onCheckedChanged="@{(view, checked)->actionHandler.onActionCBZ2(checked)}"
+            android:text="周二晚8点到10点"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/materialCardView" />
 
-        <Button
-            android:onClick="@{()->actionHandler.onActionWeek5()}"
-            android:id="@+id/button4"
+        <CheckBox
+            android:id="@+id/checkBox2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginLeft="8dp"
             android:layout_marginTop="8dp"
-            android:text="周五晚场地"
-            app:layout_constraintStart_toEndOf="@+id/button3"
+            android:checked="@{!isSelectZ2}"
+            android:onCheckedChanged="@{(view, checked)->actionHandler.onActionCBZ5(checked)}"
+            android:text="周五晚8点到10点"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/checkBox" />
+
+        <CheckBox
+            android:id="@+id/checkBox3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:checked="@{isAutoSubmit}"
+            android:onCheckedChanged="@{(view, checked)->actionHandler.onActionCBAutoSubmit(checked)}"
+            android:text="自动提交订单"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/materialCardView" />
+
+        <CheckBox
+            android:clickable="false"
+            android:id="@+id/checkBox4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="8dp"
+            android:checked="@{isAutoStart}"
+            android:onCheckedChanged="@{(view, checked)->actionHandler.onActionCBAutoStart(checked)}"
+            android:text="定时抢场地"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

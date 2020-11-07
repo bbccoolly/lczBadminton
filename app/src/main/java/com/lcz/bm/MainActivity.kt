@@ -1,7 +1,10 @@
 package com.lcz.bm
 
 import android.annotation.SuppressLint
-import android.os.*
+import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.os.Message
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -36,8 +39,12 @@ class MainActivity : AppCompatActivity(), MainActionHandler,
     private var msgArrays = ArrayList<ShowMsgEntity>()
     private var mRefreshStatusUtil: RefreshStatusUtil? = null
     private val prefs = SharedPreferenceStorage(this)
-
     private var mSelectPlaceData = "2020-11-08"
+
+    private var isSelectZ2 = true
+    private var isAutoSubmit = true
+    private var isAutoStart = true
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,15 +53,36 @@ class MainActivity : AppCompatActivity(), MainActionHandler,
         smRecyclerView = binding.recycleViewTxt
         initCurrentTime()
         initRecyclerView()
-        initHandlerTime()
+        updateCheckBoxStatus()
+        updateCheckBoxAutoStart()
+    }
 
+    private fun updateCheckBoxAutoStart() {
+        binding.isAutoStart = isAutoStart
+    }
+
+    @SuppressLint("SimpleDateFormat")
+    private fun updateCheckBoxStatus() {
+        binding.isSelectZ2 = isSelectZ2
+        binding.isAutoSubmit = isAutoSubmit
+
+        val c = Calendar.getInstance()
+        if (isSelectZ2) {
+            c.add(Calendar.DAY_OF_MONTH, +1)
+        } else {
+            c.add(Calendar.DAY_OF_MONTH, +4)
+        }
+        val time = c.time
+        mSelectPlaceData = SimpleDateFormat("yyyy-MM-dd").format(time)
+        Log.d("TAG", "S2--------$mSelectPlaceData")
+        binding.selectPlace = "要预定场地时间为：$mSelectPlaceData"
     }
 
     private fun initHandlerTime() {
         if (mRefreshStatusUtil == null) {
             mRefreshStatusUtil = RefreshStatusUtil(this, this)
         }
-//        mRefreshStatusUtil?.start()
+        mRefreshStatusUtil?.start()
     }
 
     private fun initRecyclerView() {
@@ -77,8 +105,8 @@ class MainActivity : AppCompatActivity(), MainActionHandler,
     }
 
     @SuppressLint("ShowToast")
-    override fun onActionLogin() {
-        getRepository(5)
+    override fun onActionStart() {
+        initHandlerTime()
     }
 
     private fun getRepository(type: Int) {
@@ -210,6 +238,9 @@ class MainActivity : AppCompatActivity(), MainActionHandler,
                 })
             }
             4 -> {
+                if (!isAutoSubmit) {
+                    return
+                }
                 val submitRetrofit = bmApi.submitOrder(
                     mapOf(
                         "api_version" to "5",
@@ -270,7 +301,7 @@ class MainActivity : AppCompatActivity(), MainActionHandler,
                         } else {
                             if (result != null) {
                                 if (result.code == 906) {
-                                    mHandler.sendEmptyMessage(SUCCESS_TOKEN_CHECK_ERROR)
+                                    mHandler.sendEmptyMessage(SUCCESS_TOKEN_CHECK_OUT_TIME)
                                 }
                                 val obtainMessage = mHandler.obtainMessage()
                                 obtainMessage.what = SUCCESS_TOKEN_CHECK_OTHER_ERROR
@@ -394,29 +425,32 @@ class MainActivity : AppCompatActivity(), MainActionHandler,
         return submitDataEntity
     }
 
-    override fun onActionTest() {
-        mHandler.sendEmptyMessage(IS_TEST)
+    override fun onActionClear() {
     }
 
-    @SuppressLint("SimpleDateFormat")
-    override fun onActionWeek2() {
-        mSelectPlaceData
-        val c = Calendar.getInstance()
-        c.add(Calendar.DAY_OF_MONTH, +1)
-        val time = c.time
-        mSelectPlaceData = SimpleDateFormat("yyyy-MM-dd").format(time)
-        Log.d("TAG", "S2--------$mSelectPlaceData")
-        binding.selectPlace = "要预定场地时间为：$mSelectPlaceData"
+
+    override fun onActionCBZ2(checked: Boolean) {
+        isSelectZ2 = checked
+        updateCheckBoxStatus()
     }
 
-    @SuppressLint("SimpleDateFormat")
-    override fun onActionWeek5() {
-        val c = Calendar.getInstance()
-        c.add(Calendar.DAY_OF_MONTH, +4)
-        val time = c.time
-        mSelectPlaceData = SimpleDateFormat("MM-dd").format(time)
-        Log.d("TAG", "S5--------$mSelectPlaceData")
-        binding.selectPlace = "要预定场地时间为：$mSelectPlaceData"
+    override fun onActionCBZ5(checked: Boolean) {
+        isSelectZ2 = !checked
+        updateCheckBoxStatus()
+    }
+
+    override fun onActionCBAutoSubmit(checked: Boolean) {
+        isAutoSubmit = checked
+        updateCheckBoxStatus()
+    }
+
+    override fun onActionCBAutoStart(checked: Boolean) {
+        isAutoStart = checked
+        if (checked) {
+        } else {
+            mRefreshStatusUtil?.release()
+        }
+        updateCheckBoxAutoStart()
     }
 
 
@@ -455,11 +489,6 @@ class MainActivity : AppCompatActivity(), MainActionHandler,
 
     @SuppressLint("SimpleDateFormat")
     override fun onRefreshStatus() {
-//        if (!isMonDay()) {
-//            mHandler.sendEmptyMessage(IS_NOT_MONDAY)
-//            mRefreshStatusUtil?.release()
-//            return
-//        }
         val mSDF = SimpleDateFormat(TIME_STYLE)
         mCurrentStringTime = mSDF.format(System.currentTimeMillis())
         val mCurrentData = mSDF.parse(mCurrentStringTime)
@@ -504,11 +533,11 @@ class MainActivity : AppCompatActivity(), MainActionHandler,
                         refreshRecyclerViewData(msg.obj.toString())
                     }
                     17 -> {
-                        refreshRecyclerViewData("token 可用,处于登录状态中")
+                        refreshRecyclerViewData("登录状态校验成功")
                         getRepository(2)
                     }
                     18 -> {
-                        refreshRecyclerViewData("token 失效正在重新登录")
+                        refreshRecyclerViewData("登录状态校验失效，正在重新登录")
                         getRepository(1)
                     }
                     19 -> {
@@ -519,6 +548,7 @@ class MainActivity : AppCompatActivity(), MainActionHandler,
                     }
                     2 -> {
                         refreshRecyclerViewData("开始请求网络")
+                        getRepository(5)
                     }
                     3 -> {
                         refreshRecyclerViewData("已超过开抢时间，请用其他软件预定场地")
@@ -530,10 +560,19 @@ class MainActivity : AppCompatActivity(), MainActionHandler,
             }
         }
 
+    @SuppressLint("SimpleDateFormat")
     private fun initCurrentTime() {
         val mSDF = SimpleDateFormat(TIME_CURRENT)
-        mSelectTime = mSDF.format(System.currentTimeMillis()) + " 18:00:00"
-        binding.selectTime = "开始订场时间：$mSelectTime"
+        mSelectTime = mSDF.format(System.currentTimeMillis()) + " 09:00:00"
+        binding.selectTime = mSelectTime
+
+
+        val c = Calendar.getInstance()
+        c.add(Calendar.DAY_OF_MONTH, +1)
+        val time = c.time
+        mSelectPlaceData = SimpleDateFormat("yyyy-MM-dd").format(time)
+        Log.d("TAG", "S2--------$mSelectPlaceData")
+        binding.selectPlace = "要预定场地时间为：$mSelectPlaceData"
     }
 
 
@@ -545,7 +584,7 @@ class MainActivity : AppCompatActivity(), MainActionHandler,
         const val SUCCESS_START_NET_PAY = 15
         const val ERROR_NET_MSG = 16
         const val SUCCESS_TOKEN_CHECK = 17
-        const val SUCCESS_TOKEN_CHECK_ERROR = 18
+        const val SUCCESS_TOKEN_CHECK_OUT_TIME = 18
         const val SUCCESS_TOKEN_CHECK_OTHER_ERROR = 19
         const val LONG_TIME_REFRESH = 1
         const val START_REQUEST_NET = 2

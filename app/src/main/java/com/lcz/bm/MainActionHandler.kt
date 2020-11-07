@@ -7,8 +7,10 @@ package com.lcz.bm
  * create by Arrow on 2020-11-05
  */
 interface MainActionHandler {
-    fun onActionLogin()
-    fun onActionTest()
-    fun onActionWeek2()
-    fun onActionWeek5()
+    fun onActionStart()
+    fun onActionClear()
+    fun onActionCBZ2(checked: Boolean)
+    fun onActionCBZ5(checked: Boolean)
+    fun onActionCBAutoSubmit(checked: Boolean)
+    fun onActionCBAutoStart(checked: Boolean)
 }
