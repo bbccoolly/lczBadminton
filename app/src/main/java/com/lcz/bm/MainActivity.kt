@@ -20,6 +20,7 @@ import com.lcz.bm.databinding.ActivityMainBinding
 import com.lcz.bm.di.InMemoryLogger
 import com.lcz.bm.entity.*
 import com.lcz.bm.util.DateFormatterUtil
+import com.lcz.bm.util.GsonUtil
 import com.lcz.bm.util.RefreshStatusUtil
 import com.lcz.bm.util.SharedPreferenceStorage
 import dagger.hilt.android.AndroidEntryPoint
@@ -46,14 +47,18 @@ class MainActivity : AppCompatActivity(), MainActionHandler,
     @Inject
     lateinit var dateFormatter: DateFormatterUtil
 
+    @Inject
+    lateinit var prefs: SharedPreferenceStorage
+
+    @Inject
+    lateinit var gson: GsonUtil
+
 
     private lateinit var binding: ActivityMainBinding
-    private var gson: Gson? = null
     private lateinit var showMsgAdapter: ShowMsgAdapter
     private lateinit var smRecyclerView: RecyclerView
     private var msgArrays = ArrayList<ShowMsgEntity>()
     private var mRefreshStatusUtil: RefreshStatusUtil? = null
-    private val prefs = SharedPreferenceStorage(this)
     private var mSelectPlaceData = "2020-11-08"
 
     private var isSelectZ2 = true
@@ -262,7 +267,7 @@ class MainActivity : AppCompatActivity(), MainActionHandler,
                         "platform" to "1",
                         "token" to prefs.token.toString()
                     ),
-                    map2Body(getPlaceData())
+                    gson.map2Body(getPlaceData())
                 )
                 submitRetrofit.enqueue(object : Callback<BaseSubmitEntity> {
                     override fun onResponse(
@@ -485,24 +490,6 @@ class MainActivity : AppCompatActivity(), MainActionHandler,
         }
     }
 
-
-    fun map2Body(`object`: Any): RequestBody {
-        checkGson()
-        val data = toJson(`object`)
-        return RequestBody.create(MediaType.parse("application/json; charset=utf-8"), data)
-        //return RequestBody.create("application/json; charset=utf-8".MediaType(), data)
-    }
-
-    private fun toJson(`object`: Any): String {
-        checkGson()
-        return gson!!.toJson(`object`)
-    }
-
-    private fun checkGson() {
-        if (gson == null) {
-            gson = Gson()
-        }
-    }
 
     private fun refreshRecyclerViewData(msg: String) {
         if (!smRecyclerView.isComputingLayout) {
