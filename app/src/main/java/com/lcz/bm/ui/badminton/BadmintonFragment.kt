@@ -11,6 +11,7 @@ import androidx.lifecycle.Observer
 import com.lcz.bm.databinding.FragmentBadmintonBinding
 import com.lcz.bm.net.EventObserver
 import com.lcz.bm.util.DateFormatterUtil
+import com.lcz.bm.util.ProvideOrderDataUtil
 import com.lcz.bm.util.SharedPreferenceStorage
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -31,6 +32,9 @@ class BadmintonFragment : Fragment(), BadmintonActionHandler {
 
     @Inject
     lateinit var prefs: SharedPreferenceStorage
+
+    @Inject
+    lateinit var provideOrderDataUtil: ProvideOrderDataUtil
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -58,6 +62,23 @@ class BadmintonFragment : Fragment(), BadmintonActionHandler {
             if (uiModel.showMsg != null && !uiModel.showMsg.hasBeenHandled) {
                 uiModel.showMsg.getContentIfNotHandled()?.let {
                     Log.d("TAG", it)
+                }
+            }
+        })
+
+        viewModel.placeInfo.observe(viewLifecycleOwner, EventObserver {
+            val placeList = it.data
+            val data = placeList[0]
+            val fieldList = data.fieldList
+            for (element in fieldList) {//场地
+//                Log.d("observe", "场地号 id- " + element.id)
+                for (i in element.priceList.indices) {
+                    if (i >= 22) {
+                        Log.d(
+                            "observe",
+                            "时间段 id- " + i + " " + element.priceList[i].id + " " + element.priceList[i].startTime
+                        )
+                    }
                 }
             }
         })
@@ -97,10 +118,10 @@ class BadmintonFragment : Fragment(), BadmintonActionHandler {
     }
 
     override fun onAction4() {
-        viewModel.checkPlaceStatus(dateFormatterUtil.getStartNetTimeString())
+//        viewModel.checkPlaceStatus(dateFormatterUtil.getStartNetTimeString())
     }
 
     override fun onAction5() {
-        viewModel.submitOrder(dateFormatterUtil.getStartNetTimeString())
+//        viewModel.submitOrder(dateFormatterUtil.getStartNetTimeString())
     }
 }

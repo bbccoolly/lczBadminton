@@ -7,6 +7,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lcz.bm.entity.LoginUserEntity
+import com.lcz.bm.entity.PlaceEntity
+import com.lcz.bm.entity.SubmitEntity
 import com.lcz.bm.net.Event
 import com.lcz.bm.net.Result
 import com.lcz.bm.ui.login.LoginRemoteDataSource
@@ -34,6 +36,9 @@ class BadmintonViewModel @ViewModelInject internal constructor(
 
     private val _loginInfo = MutableLiveData<Event<LoginUserEntity>>()
     val loginInfo: LiveData<Event<LoginUserEntity>> = _loginInfo
+
+    private val _placeInfo = MutableLiveData<Event<PlaceEntity>>()
+    val placeInfo: LiveData<Event<PlaceEntity>> = _placeInfo
 
     private val _uiState = MutableLiveData<LoginUiModel>()
     val uiState: LiveData<LoginUiModel> = _uiState
@@ -68,7 +73,7 @@ class BadmintonViewModel @ViewModelInject internal constructor(
         netJob3 = launchGetPlaceList(time)
     }
 
-    //获取场地列表 4
+    //校验场地状态 4
     fun checkPlaceStatus(time: String) {
         if (netJob4?.isActive == true) {
             return
@@ -77,11 +82,11 @@ class BadmintonViewModel @ViewModelInject internal constructor(
     }
 
     //提交订单 5
-    fun submitOrder(time:String) {
+    fun submitOrder(submitEntity: SubmitEntity) {
         if (netJob5?.isActive == true) {
             return
         }
-        netJob5 = launchSubmitOrder(time)
+        netJob5 = launchSubmitOrder(submitEntity)
     }
 
 
@@ -144,6 +149,7 @@ class BadmintonViewModel @ViewModelInject internal constructor(
             val result = placeRemoteDataSource.getPlaceList(prefs.token.toString(), time)
             withContext(dispatcherProvider.main) {
                 if (result is Result.Success) {
+                    _placeInfo.postValue(Event(result.data))
                     emitUiState(
                         isLoading = Event(false),
                         isResultSuccess = Event(true),
@@ -186,12 +192,12 @@ class BadmintonViewModel @ViewModelInject internal constructor(
         }
     }
 
-    private fun launchSubmitOrder(time: String): Job? {
+    private fun launchSubmitOrder(submitEntity: SubmitEntity): Job? {
         return viewModelScope.launch(dispatcherProvider.computation) {
             withContext(dispatcherProvider.main) {
                 emitUiState(isLoading = Event(true))
             }
-            val result = orderRemoteDataSource.submitOrder(prefs.token.toString(),time)
+            val result = orderRemoteDataSource.submitOrder(prefs.token.toString(),submitEntity)
             withContext(dispatcherProvider.main) {
                 if (result is Result.Success) {
                     emitUiState(

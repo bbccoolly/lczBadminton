@@ -11,13 +11,13 @@ import java.io.Serializable
 data class PlaceEntity(
     val allpage: Any,
     val code: Int,
-    val `data`: List<Data>,
+    val `data`: List<Place>,
     val msg: String,
     val pagenum: Any,
     val total: Any
 )
 
-data class Data(
+data class Place(
     val coupons: List<Any>,
     val fieldList: List<Field>,
     val maxMinutes: Double,

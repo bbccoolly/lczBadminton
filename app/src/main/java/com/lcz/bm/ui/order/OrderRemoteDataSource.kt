@@ -3,6 +3,7 @@ package com.lcz.bm.ui.order
 import android.util.Log
 import com.lcz.bm.api.LczBMService
 import com.lcz.bm.entity.ResultEntity
+import com.lcz.bm.entity.SubmitEntity
 import com.lcz.bm.entity.SuccessEntity
 import com.lcz.bm.net.Result
 import com.lcz.bm.net.safeApiCall
@@ -19,16 +20,15 @@ import javax.inject.Inject
  */
 class OrderRemoteDataSource @Inject constructor(
     private val service: LczBMService,
-    private val gson: GsonUtil,
-    private val provideDataUtil: ProvideOrderDataUtil
+    private val gson: GsonUtil
 ) {
     suspend fun getOrderList(token: String) = safeApiCall(
         call = { requestGetOrderList(token) },
         errorMessage = "网络连接异常"
     )
 
-    suspend fun submitOrder(token: String, time: String) = safeApiCall(
-        call = { requestSubmitOrder(token, time) },
+    suspend fun submitOrder(token: String,submitEntity: SubmitEntity) = safeApiCall(
+        call = { requestSubmitOrder(token, submitEntity) },
         errorMessage = "网络连接异常"
     )
 
@@ -57,14 +57,17 @@ class OrderRemoteDataSource @Inject constructor(
         return Result.Error(IOException("Access token retrieval failed ${response.code()} ${response.message()}"))
     }
 
-    private suspend fun requestSubmitOrder(token: String, time: String): Result<ResultEntity> {
+    private suspend fun requestSubmitOrder(
+        token: String,
+        submitEntity: SubmitEntity
+    ): Result<ResultEntity> {
         val response = service.submitOrder(
             mapOf(
                 "api_version" to "5",
                 "platform" to "1",
                 "token" to token
             ),
-            gson.map2Body(provideDataUtil.providePlaceData(time))
+            gson.map2Body(submitEntity)
         )
         if (response.isSuccessful) {
             val result = response.body()
