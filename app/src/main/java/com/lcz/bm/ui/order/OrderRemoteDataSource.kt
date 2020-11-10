@@ -32,7 +32,7 @@ class OrderRemoteDataSource @Inject constructor(
         errorMessage = "网络连接异常"
     )
 
-    private suspend fun requestGetOrderList(token: String): Result<String> {
+    private suspend fun requestGetOrderList(token: String): Result<SuccessEntity> {
         val response = service.getOrderList(
             mapOf(
                 "api_version" to "5",
@@ -44,15 +44,15 @@ class OrderRemoteDataSource @Inject constructor(
                 "curPage" to "1"
             )
         )
-        Log.d("TAG", "response- " + response.body())
         if (response.isSuccessful) {
             val result = response.body()
-            return if (result!!.isSuccess) {
-                Result.Success("token 校验成功")
-            } else {
-                return Result.Error(IOException(result.msg))
+            if (result != null) {
+                return if (result.code == 900) {
+                    Result.Success(data = result)
+                } else {
+                    Result.Error(IOException(result.msg))
+                }
             }
-
         }
         return Result.Error(IOException("Access token retrieval failed ${response.code()} ${response.message()}"))
     }

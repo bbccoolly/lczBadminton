@@ -9,18 +9,27 @@ import java.io.Serializable
  * create by Arrow on 2020-11-10
  */
 data class PlaceEntity(
+    val allpage: Any,
+    val code: Int,
+    val `data`: List<Data>,
+    val msg: String,
+    val pagenum: Any,
+    val total: Any
+)
+
+data class Data(
     val coupons: List<Any>,
     val fieldList: List<Field>,
-    val maxMinutes: Int,
+    val maxMinutes: Double,
     val maxTime: Int,
-    val minMinutes: Int,
+    val minMinutes: Double,
     val minTime: Int,
     val platform: String,
-    val singleMinMinutes: Int,
+    val singleMinMinutes: Double,
     val singleMinTime: Int,
     val type: String,
     val typeName: String
-) : Serializable
+)
 
 data class Field(
     val fieldName: String,
@@ -32,7 +41,7 @@ data class Field(
     val minSeriesHours: String,
     val parentFieldId: Any,
     val priceList: List<Price>
-) : Serializable
+)
 
 data class Price(
     val endTime: String,
@@ -41,4 +50,4 @@ data class Price(
     val seriesId: String,
     val startTime: String,
     val status: String
-) : Serializable
+)

@@ -96,7 +96,7 @@ class BadmintonViewModel @ViewModelInject internal constructor(
                     emitUiState(
                         isLoading = Event(false),
                         isResultSuccess = Event(true),
-                        showMsg = Event(content = result.data)
+                        showMsg = Event(content = "token 校验成功")
                     )
                 } else {
                     emitUiState(

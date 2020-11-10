@@ -55,30 +55,11 @@ class BadmintonFragment : Fragment(), BadmintonActionHandler {
 
         viewModel.uiState.observe(viewLifecycleOwner, Observer { it ->
             val uiModel = it ?: return@Observer
-            if (uiModel.isLoading != null && !uiModel.isLoading.hasBeenHandled) {
-                uiModel.isLoading.getContentIfNotHandled()?.let {
-                    when (it) {
-                        true -> Log.d("TAG", "showLoading")
-                        false -> Log.d("TAG", "hideLoading")
-                    }
-                }
-            }
-
             if (uiModel.showMsg != null && !uiModel.showMsg.hasBeenHandled) {
                 uiModel.showMsg.getContentIfNotHandled()?.let {
-                    Log.d("TAG", "msg $it")
+                    Log.d("TAG", it)
                 }
             }
-
-
-            if (uiModel.isResultSuccess != null && !uiModel.isResultSuccess.hasBeenHandled) {
-                uiModel.isResultSuccess.getContentIfNotHandled()?.let {
-                    if (it) {
-                        Log.d("TAG", "登录成功")
-                    }
-                }
-            }
-
         })
     }
 

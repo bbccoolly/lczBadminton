@@ -27,7 +27,7 @@ interface LczBMService {
     suspend fun getPlaceList(
         @HeaderMap headers: Map<String, String>,
         @QueryMap map: Map<String, String>
-    ): Response<BaseHttpResult<PlaceEntity>>
+    ): Response<PlaceEntity>
 
     @GET("order/check/orderLimit")
     suspend fun checkSelectPlace(
@@ -46,7 +46,7 @@ interface LczBMService {
     suspend fun getOrderList(
         @HeaderMap headers: Map<String, String>,
         @FieldMap map: Map<String, String>
-    ): Response<BaseHttpResult<String>>
+    ): Response<SuccessEntity>
 
     companion object {
         private const val BASE_URL = "https://api.52jiayundong.com/"

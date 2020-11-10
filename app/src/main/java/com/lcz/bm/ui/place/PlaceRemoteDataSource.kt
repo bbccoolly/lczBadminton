@@ -43,13 +43,10 @@ class PlaceRemoteDataSource @Inject constructor(
         if (response.isSuccessful) {
             val result = response.body()
             if (result != null) {
-                if (result.isSuccess) {
-                    val data = result.data
-                    if (data != null) {
-                        return Result.Success(data = data)
-                    }
+                return if (result.code == 900) {
+                    Result.Success(data = result)
                 } else {
-                    return Result.Error(IOException(result.msg))
+                    Result.Error(IOException(result.msg))
                 }
             }
         }
