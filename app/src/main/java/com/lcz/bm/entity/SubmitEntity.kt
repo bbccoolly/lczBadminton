@@ -4,7 +4,7 @@ import java.io.Serializable
 
 /**
  *
- * desc: TODO
+ * desc: 提交订单参数
  *
  * create by Arrow on 2020-11-05
  */

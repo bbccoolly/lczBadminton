@@ -13,7 +13,11 @@
         android:roundIcon="@mipmap/logo"
         android:supportsRtl="true"
         android:theme="@style/Theme.LczBadminton">
-        <activity android:name=".MainActivity">
+        <activity
+            android:name=".NewMainActivity"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.LczBadminton.NoActionBar">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

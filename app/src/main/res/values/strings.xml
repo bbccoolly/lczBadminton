@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">文体3/4号场地专用</string>
+    <string name="app_name">Badminton</string>
+    <string name="tab_text_1">Badminton1</string>
+    <string name="tab_text_2">Badminton2</string>
 </resources>

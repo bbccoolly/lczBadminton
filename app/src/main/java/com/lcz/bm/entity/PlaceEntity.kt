@@ -4,20 +4,11 @@ import java.io.Serializable
 
 /**
  *
- * desc: TODO
+ * desc: 场地信息
  *
- * create by Arrow on 2020-11-05
+ * create by Arrow on 2020-11-10
  */
-data class BasePlaceEntity(
-    val allpage: Any,
-    val code: Int,
-    val `data`: List<Data>,
-    val msg: String,
-    val pagenum: Any,
-    val total: Any
-) : Serializable
-
-data class Data(
+data class PlaceEntity(
     val coupons: List<Any>,
     val fieldList: List<Field>,
     val maxMinutes: Int,

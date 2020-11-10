@@ -3,7 +3,7 @@ package com.lcz.bm.util
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
-import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody
 import javax.inject.Inject
 
@@ -16,7 +16,7 @@ import javax.inject.Inject
 class GsonUtil @Inject constructor(){
     fun map2Body(`object`: Any): RequestBody {
         val data = bean2Json(`object`)
-        return RequestBody.create(MediaType.parse("application/json; charset=utf-8"), data)
+        return RequestBody.create("application/json; charset=utf-8".toMediaTypeOrNull(), data)
     }
 
     fun bean2Json(`object`: Any): String {

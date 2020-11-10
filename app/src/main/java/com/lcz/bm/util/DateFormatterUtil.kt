@@ -30,4 +30,38 @@ class DateFormatterUtil @Inject constructor() {
     fun getData(timeS: String): Long {
         return formatter.parse(timeS).time
     }
+
+    //获取当前系统时间
+    fun getCurrentTimeString(): String {
+        return formatter.format(System.currentTimeMillis())
+    }
+
+    //获取当前系统时间
+    fun getCurrentTimeLong(): Long {
+        return formatter.parse(getCurrentTimeString()).time
+    }
+
+
+    //自动抢单时间
+    fun getStartTimeString(): String {
+        val calendar = Calendar.getInstance()
+        calendar.add(Calendar.DAY_OF_MONTH, +1)//当前时间一天后
+        val time = calendar.time
+        return formatter2.format(time) + " 09:00:00"
+    }
+
+    //获取当前订单开始时间
+    fun getSelectTImeLong(): Long {
+        return formatter2.parse(getStartTimeString()).time
+    }
+
+    //自动抢单时间
+    fun getStartNetTimeString(): String {
+        val calendar = Calendar.getInstance()
+        calendar.add(Calendar.DAY_OF_MONTH, +1)//当前时间一天后
+        val time = calendar.time
+        return formatter2.format(time)
+    }
+
+
 }

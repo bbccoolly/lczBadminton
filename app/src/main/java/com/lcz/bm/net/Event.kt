@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.lcz.bm.util
+package com.lcz.bm.net
 
 import androidx.lifecycle.Observer
 
