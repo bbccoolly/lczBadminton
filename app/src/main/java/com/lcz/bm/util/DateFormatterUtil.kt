@@ -84,35 +84,60 @@ class DateFormatterUtil @Inject constructor() {
     //获取某天场地信息
     fun getDayFieldPlaceTimeWeek(type: Int): String {
         val calendar = Calendar.getInstance()
-        var week = "星期一"
         when (type) {
             2 -> {
                 calendar.add(Calendar.DAY_OF_MONTH, +1)//当前时间一天后
-                week = "星期二"
             }
             3 -> {
                 calendar.add(Calendar.DAY_OF_MONTH, +2)//当前时间一天后
-                week = "星期三"
             }
             4 -> {
                 calendar.add(Calendar.DAY_OF_MONTH, +3)//当前时间一天后
-                week = "星期四"
             }
             5 -> {
                 calendar.add(Calendar.DAY_OF_MONTH, +4)//当前时间一天后
-                week = "星期五"
             }
             6 -> {
                 calendar.add(Calendar.DAY_OF_MONTH, +5)//当前时间一天后
-                week = "星期六"
             }
             7 -> {
                 calendar.add(Calendar.DAY_OF_MONTH, +6)//当前时间一天后
-                week = "星期天"
             }
         }
         val time = calendar.time
-        return "预定场地时间为：" + formatter2.format(time) + " " + week + " 晚8点到10点"
+        return "预定场地时间为：" + formatter2.format(time) + " " + getTimeDayOfWeek(time) + " 晚8点到10点"
+    }
+
+    private fun getTimeDayOfWeek(time:Date): String {
+        val calendar = Calendar.getInstance()
+//        calendar.timeZone = TimeZone.getTimeZone("GMT+8:00")
+        calendar.time = time
+        val day = calendar.get(Calendar.DAY_OF_WEEK)
+        var week = "星期一"
+        when (day) {
+            1->{
+                week = "星期天"
+            }
+            2->{
+                week = "星期一"
+            }
+            3->{
+                week = "星期二"
+            }
+            4->{
+                week = "星期三"
+            }
+            5->{
+                week = "星期四"
+            }
+            6->{
+                week = "星期五"
+            }
+            7->{
+                week = "星期六"
+            }
+        }
+        return week
     }
 
 }
