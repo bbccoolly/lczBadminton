@@ -43,16 +43,15 @@ class DateFormatterUtil @Inject constructor() {
 
 
     //自动抢单时间
-    fun getStartTimeString(): String {
+    fun getAutoStartTimeString(): String {
         val calendar = Calendar.getInstance()
-        calendar.add(Calendar.DAY_OF_MONTH, +1)//当前时间一天后
         val time = calendar.time
         return formatter2.format(time) + " 09:00:00"
     }
 
     //获取当前订单开始时间
-    fun getSelectTImeLong(): Long {
-        return formatter2.parse(getStartTimeString()).time
+    fun getAutoSelectTImeLong(): Long {
+        return formatter2.parse(getAutoStartTimeString()).time
     }
 
     //获取某天场地信息

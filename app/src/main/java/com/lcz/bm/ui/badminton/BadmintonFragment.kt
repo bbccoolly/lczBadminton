@@ -10,6 +10,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import com.google.android.material.checkbox.MaterialCheckBox
 import com.lcz.bm.adapter.RecyclerMsgAdapter
 import com.lcz.bm.databinding.FragmentBadmintonBinding
 import com.lcz.bm.entity.SelectFieldPlaceEntity
@@ -33,6 +34,7 @@ import javax.inject.Inject
 class BadmintonFragment : Fragment(), BadmintonActionHandler {
 
     private val viewModel: BadmintonViewModel by viewModels()
+    private lateinit var binding: FragmentBadmintonBinding
 
     @Inject
     lateinit var dateFormatterUtil: DateFormatterUtil
@@ -50,18 +52,19 @@ class BadmintonFragment : Fragment(), BadmintonActionHandler {
     private val msgList: LiveData<Event<List<ShowMsgEntity>>> = _msgList
 
     private var mSelectFPList: ArrayList<SelectFieldPlaceEntity> = ArrayList()
+    private var mSelectDay = 2
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val binding = FragmentBadmintonBinding.inflate(inflater, container, false)
+        binding = FragmentBadmintonBinding.inflate(inflater, container, false)
         context ?: return binding.root
         binding.actionHandler = this
         binding.recyclerView.adapter = mAdapter
-        binding.startTime = dateFormatterUtil.getStartTimeString()
-        binding.selectTime = dateFormatterUtil.getDayFieldPlaceTimeWeek(1)
+        binding.startTime = dateFormatterUtil.getAutoStartTimeString()
+        binding.selectTime = dateFormatterUtil.getDayFieldPlaceTimeWeek(mSelectDay)
         subscribeRecyclerUI()
         return binding.root
     }
@@ -155,10 +158,36 @@ class BadmintonFragment : Fragment(), BadmintonActionHandler {
     }
 
     override fun onAction3() {
-        viewModel.getPlaceList(dateFormatterUtil.getDayFieldPlaceTime(1))
+        viewModel.getPlaceList(dateFormatterUtil.getDayFieldPlaceTime(mSelectDay))
     }
 
     override fun onAction5() {
-        viewModel.submitOrder(provideOrderDataUtil.providePlaceData(mSelectFPList,dateFormatterUtil.getDayFieldPlaceTime(1)))
+        viewModel.submitOrder(
+            provideOrderDataUtil.providePlaceData(
+                mSelectFPList,
+                dateFormatterUtil.getDayFieldPlaceTime(mSelectDay)
+            )
+        )
+    }
+
+    override fun onActionCBDS(checked: Boolean) {
+    }
+
+    override fun onActionCBZ2(checked: Boolean) {
+        binding.mcB2 = checked
+        binding.mcB5 = !checked
+        if (checked) {
+            mSelectDay = 2
+        }
+        binding.selectTime = dateFormatterUtil.getDayFieldPlaceTimeWeek(mSelectDay)
+    }
+
+    override fun onActionCBZ5(checked: Boolean) {
+        binding.mcB2 = !checked
+        binding.mcB5 = checked
+        if (checked) {
+            mSelectDay = 5
+        }
+        binding.selectTime = dateFormatterUtil.getDayFieldPlaceTimeWeek(mSelectDay)
     }
 }

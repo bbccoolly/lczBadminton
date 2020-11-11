@@ -11,4 +11,7 @@ interface BadmintonActionHandler {
     fun onAction2()
     fun onAction3()
     fun onAction5()
+    fun onActionCBDS(checked:Boolean)
+    fun onActionCBZ2(checked:Boolean)
+    fun onActionCBZ5(checked:Boolean)
 }

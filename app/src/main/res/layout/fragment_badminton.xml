@@ -16,6 +16,12 @@
         <variable
             name="selectTime"
             type="String" />
+        <variable
+            name="mCB2"
+            type="Boolean" />
+        <variable
+            name="mCB5"
+            type="Boolean" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -26,18 +32,16 @@
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/materialCardView2"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
+            android:layout_height="300dp"
             android:layout_marginStart="8dp"
             android:layout_marginLeft="8dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
-            android:layout_marginBottom="8dp"
             app:cardBackgroundColor="#009688"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toBottomOf="@+id/textView3">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerView"
@@ -50,33 +54,35 @@
                 tools:listitem="@layout/item_adapter_txt" />
         </com.google.android.material.card.MaterialCardView>
 
-        <CheckBox
+        <com.google.android.material.checkbox.MaterialCheckBox
+            android:checked="true"
+            android:clickable="false"
             android:id="@+id/checkBox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginLeft="8dp"
             android:layout_marginTop="8dp"
+            android:onCheckedChanged="@{(v,checked)->actionHandler.onActionCBDS(checked)}"
             android:text="定时抢"
+            android:textColor="@color/purple_200"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:textColor="@color/purple_200"
-            android:textSize="@dimen/sp_14"
             android:id="@+id/textView2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginLeft="16dp"
             android:text="@{startTime}"
+            android:textColor="@color/purple_200"
+            android:textSize="@dimen/sp_14"
             app:layout_constraintBottom_toBottomOf="@+id/checkBox"
             app:layout_constraintStart_toEndOf="@+id/checkBox"
             app:layout_constraintTop_toTopOf="@+id/checkBox" />
 
         <TextView
-            android:textColor="@color/teal_200"
-            android:textSize="@dimen/sp_14"
             android:id="@+id/textView3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -84,8 +90,36 @@
             android:layout_marginLeft="8dp"
             android:layout_marginTop="8dp"
             android:text="@{selectTime}"
+            android:textColor="@color/teal_700"
+            android:textSize="@dimen/sp_14"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/checkBox3" />
+
+        <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/checkBox2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="8dp"
+            android:checked="@{mCB2}"
+            android:onCheckedChanged="@{(v,checked)->actionHandler.onActionCBZ2(checked)}"
+            android:text="周二晚8点"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/checkBox" />
+
+        <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/checkBox3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:checked="@{mCB5}"
+            android:layout_marginTop="8dp"
+            android:onCheckedChanged="@{(v,checked)->actionHandler.onActionCBZ5(checked)}"
+            android:text="周五晚8点"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/checkBox2" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
