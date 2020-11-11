@@ -17,6 +17,8 @@ android {
         versionCode 1
         versionName "1.0"
 
+        multiDexEnabled true
+
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -79,5 +81,9 @@ dependencies {
     // Room
     implementation "androidx.room:room-runtime:2.2.5"
     kapt "androidx.room:room-compiler:2.2.5"
+
+    // doraemonkit
+    debugImplementation 'com.didichuxing.doraemonkit:dokitx:3.3.4'
+    releaseImplementation 'com.didichuxing.doraemonkit:dokitx-no-op:3.3.4'
 
 }

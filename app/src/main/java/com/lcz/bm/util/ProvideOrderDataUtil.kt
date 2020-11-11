@@ -12,13 +12,15 @@ import javax.inject.Inject
  * create by Arrow on 2020-11-10
  */
 class ProvideOrderDataUtil @Inject constructor(
-    private val fileId1: String,
-    private val placeId1: Int,
-    private val fileId2: String,
-    private val placeId2: Int,
-    private val time: String
+
 ) {
-    fun providePlaceData(): SubmitEntity {
+    fun providePlaceData(
+        fileId1: String,
+        placeId1: Int,
+        fileId2: String,
+        placeId2: Int,
+        time: String
+    ): SubmitEntity {
         val placeList = ArrayList<Fieldlist>()
         val idList31 = ArrayList<String>()
         idList31.add(placeId1.toString())
