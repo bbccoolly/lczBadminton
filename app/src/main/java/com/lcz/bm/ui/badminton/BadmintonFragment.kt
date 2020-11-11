@@ -7,13 +7,20 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import com.lcz.bm.adapter.RecyclerMsgAdapter
 import com.lcz.bm.databinding.FragmentBadmintonBinding
+import com.lcz.bm.entity.SelectFieldPlaceEntity
+import com.lcz.bm.entity.ShowMsgEntity
+import com.lcz.bm.net.Event
 import com.lcz.bm.net.EventObserver
 import com.lcz.bm.util.DateFormatterUtil
 import com.lcz.bm.util.ProvideOrderDataUtil
 import com.lcz.bm.util.SharedPreferenceStorage
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.*
 import javax.inject.Inject
 
 /**
@@ -36,6 +43,14 @@ class BadmintonFragment : Fragment(), BadmintonActionHandler {
     @Inject
     lateinit var provideOrderDataUtil: ProvideOrderDataUtil
 
+    @Inject
+    lateinit var mAdapter: RecyclerMsgAdapter
+
+    private val _msgList = MutableLiveData<Event<List<ShowMsgEntity>>>()
+    private val msgList: LiveData<Event<List<ShowMsgEntity>>> = _msgList
+
+    private var mSelectFPList: ArrayList<SelectFieldPlaceEntity> = ArrayList()
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -44,7 +59,17 @@ class BadmintonFragment : Fragment(), BadmintonActionHandler {
         val binding = FragmentBadmintonBinding.inflate(inflater, container, false)
         context ?: return binding.root
         binding.actionHandler = this
+        binding.recyclerView.adapter = mAdapter
+        binding.startTime = dateFormatterUtil.getStartTimeString()
+        binding.selectTime = dateFormatterUtil.getDayFieldPlaceTimeWeek(1)
+        subscribeRecyclerUI()
         return binding.root
+    }
+
+    private fun subscribeRecyclerUI() {
+        msgList.observe(viewLifecycleOwner, EventObserver {
+            mAdapter.submitList(it)
+        })
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -71,14 +96,30 @@ class BadmintonFragment : Fragment(), BadmintonActionHandler {
             val data = placeList[0]
             val fieldList = data.fieldList
             for (element in fieldList) {//场地
-//                Log.d("observe", "场地号 id- " + element.id)
                 for (i in element.priceList.indices) {
-                    if (i >= 22) {
-                        Log.d(
-                            "observe",
-                            "时间段 id- " + i + " " + element.priceList[i].id + " " + element.priceList[i].startTime
-                        )
+                    Log.d(
+                        "observe",
+                        "index i- " + i + " 场地号 id- " + element.id + " 时间段 id- " + element.priceList[i].id + " " + element.priceList[i].startTime + " " + element.priceList[i].status
+                    )
+                    if (i == 22) {
+                        if (element.priceList[i].status == "0") {
+                            if (mSelectFPList.size >= 2) {
+                                //场地选择成功
+                            } else {
+                                mSelectFPList.add(
+                                    SelectFieldPlaceEntity(
+                                        fieldId = element.id,
+                                        placeId = element.priceList[i].id
+                                    )
+                                )
+                            }
+
+                        } else {
+                            //场地不可用
+                        }
+
                     }
+
                 }
             }
         })
@@ -114,14 +155,10 @@ class BadmintonFragment : Fragment(), BadmintonActionHandler {
     }
 
     override fun onAction3() {
-        viewModel.getPlaceList(dateFormatterUtil.getStartNetTimeString())
-    }
-
-    override fun onAction4() {
-//        viewModel.checkPlaceStatus(dateFormatterUtil.getStartNetTimeString())
+        viewModel.getPlaceList(dateFormatterUtil.getDayFieldPlaceTime(1))
     }
 
     override fun onAction5() {
-//        viewModel.submitOrder(dateFormatterUtil.getStartNetTimeString())
+        viewModel.submitOrder(provideOrderDataUtil.providePlaceData(mSelectFPList,dateFormatterUtil.getDayFieldPlaceTime(1)))
     }
 }

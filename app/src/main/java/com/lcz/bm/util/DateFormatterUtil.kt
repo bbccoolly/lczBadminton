@@ -55,13 +55,65 @@ class DateFormatterUtil @Inject constructor() {
         return formatter2.parse(getStartTimeString()).time
     }
 
-    //自动抢单时间
-    fun getStartNetTimeString(): String {
+    //获取某天场地信息
+    fun getDayFieldPlaceTime(type: Int): String {
         val calendar = Calendar.getInstance()
-        calendar.add(Calendar.DAY_OF_MONTH, +1)//当前时间一天后
+        when (type) {
+            2 -> {
+                calendar.add(Calendar.DAY_OF_MONTH, +1)//当前时间一天后
+            }
+            3 -> {
+                calendar.add(Calendar.DAY_OF_MONTH, +2)//当前时间一天后
+            }
+            4 -> {
+                calendar.add(Calendar.DAY_OF_MONTH, +3)//当前时间一天后
+            }
+            5 -> {
+                calendar.add(Calendar.DAY_OF_MONTH, +4)//当前时间一天后
+            }
+            6 -> {
+                calendar.add(Calendar.DAY_OF_MONTH, +5)//当前时间一天后
+            }
+            7 -> {
+                calendar.add(Calendar.DAY_OF_MONTH, +6)//当前时间一天后
+            }
+        }
         val time = calendar.time
         return formatter2.format(time)
     }
 
+    //获取某天场地信息
+    fun getDayFieldPlaceTimeWeek(type: Int): String {
+        val calendar = Calendar.getInstance()
+        var week = "星期一"
+        when (type) {
+            2 -> {
+                calendar.add(Calendar.DAY_OF_MONTH, +1)//当前时间一天后
+                week = "星期二"
+            }
+            3 -> {
+                calendar.add(Calendar.DAY_OF_MONTH, +2)//当前时间一天后
+                week = "星期三"
+            }
+            4 -> {
+                calendar.add(Calendar.DAY_OF_MONTH, +3)//当前时间一天后
+                week = "星期四"
+            }
+            5 -> {
+                calendar.add(Calendar.DAY_OF_MONTH, +4)//当前时间一天后
+                week = "星期五"
+            }
+            6 -> {
+                calendar.add(Calendar.DAY_OF_MONTH, +5)//当前时间一天后
+                week = "星期六"
+            }
+            7 -> {
+                calendar.add(Calendar.DAY_OF_MONTH, +6)//当前时间一天后
+                week = "星期天"
+            }
+        }
+        val time = calendar.time
+        return "预定场地时间为：" + formatter2.format(time) + " " + week + " 晚8点到10点"
+    }
 
 }

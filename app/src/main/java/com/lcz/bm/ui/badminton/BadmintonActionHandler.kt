@@ -10,6 +10,5 @@ interface BadmintonActionHandler {
     fun onAction1()
     fun onAction2()
     fun onAction3()
-    fun onAction4()
     fun onAction5()
 }
