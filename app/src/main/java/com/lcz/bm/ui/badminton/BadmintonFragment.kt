@@ -1,5 +1,6 @@
 package com.lcz.bm.ui.badminton
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -18,7 +19,10 @@ import com.lcz.bm.entity.ShowMsgEntity
 import com.lcz.bm.net.EventObserver
 import com.lcz.bm.util.*
 import dagger.hilt.android.AndroidEntryPoint
+import java.text.SimpleDateFormat
+import java.util.*
 import javax.inject.Inject
+import kotlin.collections.ArrayList
 
 /**
  *
@@ -217,23 +221,36 @@ class BadmintonFragment : Fragment(), BadmintonActionHandler,
                     mShowMsgList.add(ShowMsgEntity(dateFormatterUtil.getCurrentTimeString(), false))
                     subscribeRecyclerUI()
                 }
+                MSG_ACTION_1 -> {
+                    onAction1()
+
+                }
+                MSG_ACTION_3 -> {
+                    onAction3()
+                }
             }
         }
     }
 
     private var isStartNet = false
+    private val calendar = Calendar.getInstance()
+    @SuppressLint("SimpleDateFormat")
+    private val formatter1 = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+    @SuppressLint("SimpleDateFormat")
+    private val formatter2 = SimpleDateFormat("yyyy-MM-dd")
+
     override fun onRefreshStatus() {
         if (dateFormatterUtil.getCurrentTimeLong() >= dateFormatterUtil.getAutoSelectTImeLong()) {
-            isStartNet = true
-            onAction3()
             mRefreshStatusUtil!!.release()
+            isStartNet = true
+            mHandler.sendEmptyMessage(MSG_ACTION_3)
         } else {
-            isStartNet = false
             if (dateFormatterUtil.getCurrentTimeLong() == dateFormatterUtil.getAutoSelectCheckTimeLong()) {
-                onAction1()
+                mHandler.sendEmptyMessage(MSG_ACTION_1)
             } else {
                 mHandler.sendEmptyMessage(MSG_TIME_REFRESH)
             }
+            isStartNet = false
         }
     }
 
@@ -245,6 +262,8 @@ class BadmintonFragment : Fragment(), BadmintonActionHandler,
         private const val ARG_SECTION_NUMBER = "section_number"
         const val MSG_TEST = -1
         const val MSG_TIME_REFRESH = 1
+        const val MSG_ACTION_1 = 2
+        const val MSG_ACTION_3 = 3
 
         /**
          * Returns a new instance of this fragment for the given section

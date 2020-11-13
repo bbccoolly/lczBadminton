@@ -51,18 +51,19 @@ class DateFormatterUtil @Inject constructor() {
 
     //获取当前订单开始时间
     fun getAutoSelectTImeLong(): Long {
-        return formatter2.parse(getAutoStartTimeString()).time
+        return formatter.parse(getAutoStartTimeString()).time
     }
 
     //自动抢单时间
-    private fun getAutoStartCheckTimeString(): String {
+    fun getAutoStartCheckTimeString(): String {
         val calendar = Calendar.getInstance()
         val time = calendar.time
         return formatter2.format(time) + " 08:59:55"
     }
+
     //获取当前订单开始时间
     fun getAutoSelectCheckTimeLong(): Long {
-        return formatter2.parse(getAutoStartCheckTimeString()).time
+        return formatter.parse(getAutoStartCheckTimeString()).time
     }
 
     //获取某天场地信息
@@ -119,32 +120,32 @@ class DateFormatterUtil @Inject constructor() {
         return "预定场地时间为：" + formatter2.format(time) + " " + getTimeDayOfWeek(time) + " 晚8点到10点"
     }
 
-    private fun getTimeDayOfWeek(time:Date): String {
+    private fun getTimeDayOfWeek(time: Date): String {
         val calendar = Calendar.getInstance()
 //        calendar.timeZone = TimeZone.getTimeZone("GMT+8:00")
         calendar.time = time
         val day = calendar.get(Calendar.DAY_OF_WEEK)
         var week = "星期一"
         when (day) {
-            1->{
+            1 -> {
                 week = "星期天"
             }
-            2->{
+            2 -> {
                 week = "星期一"
             }
-            3->{
+            3 -> {
                 week = "星期二"
             }
-            4->{
+            4 -> {
                 week = "星期三"
             }
-            5->{
+            5 -> {
                 week = "星期四"
             }
-            6->{
+            6 -> {
                 week = "星期五"
             }
-            7->{
+            7 -> {
                 week = "星期六"
             }
         }

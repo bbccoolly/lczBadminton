@@ -129,11 +129,23 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
-            android:onClick="@{()->actionHandler.onAction1()}"
-            android:text="获取订单列表"
+            android:onClick="@{()->actionHandler.onAction3()}"
+            android:text="获取场地下单"
             app:layout_constraintBottom_toBottomOf="@+id/checkBox3"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/checkBox3" />
+
+        <Button
+            android:id="@+id/button2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:text="走登录流程"
+            android:onClick="@{()->actionHandler.onAction1()}"
+            app:layout_constraintBottom_toTopOf="@+id/checkBox3"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/checkBox2" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
