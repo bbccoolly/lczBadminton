@@ -1,27 +1,23 @@
 package com.lcz.bm.ui.badminton
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.os.Message
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import com.google.android.material.checkbox.MaterialCheckBox
 import com.lcz.bm.adapter.RecyclerMsgAdapter
 import com.lcz.bm.databinding.FragmentBadmintonBinding
 import com.lcz.bm.entity.SelectFieldPlaceEntity
 import com.lcz.bm.entity.ShowMsgEntity
-import com.lcz.bm.net.Event
 import com.lcz.bm.net.EventObserver
-import com.lcz.bm.util.DateFormatterUtil
-import com.lcz.bm.util.ProvideOrderDataUtil
-import com.lcz.bm.util.SharedPreferenceStorage
+import com.lcz.bm.util.*
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.*
 import javax.inject.Inject
 
 /**
@@ -31,7 +27,8 @@ import javax.inject.Inject
  * create by Arrow on 2020-11-09
  */
 @AndroidEntryPoint
-class BadmintonFragment : Fragment(), BadmintonActionHandler {
+class BadmintonFragment : Fragment(), BadmintonActionHandler,
+    RefreshStatusUtil.OnRefreshStatusListener {
 
     private val viewModel: BadmintonViewModel by viewModels()
     private lateinit var binding: FragmentBadmintonBinding
@@ -48,11 +45,15 @@ class BadmintonFragment : Fragment(), BadmintonActionHandler {
     @Inject
     lateinit var mAdapter: RecyclerMsgAdapter
 
-    private val _msgList = MutableLiveData<Event<List<ShowMsgEntity>>>()
-    private val msgList: LiveData<Event<List<ShowMsgEntity>>> = _msgList
+    @Inject
+    lateinit var recyclerViewUtil: RecyclerViewUtil
+
+    private var mRefreshStatusUtil: RefreshStatusUtil? = null
 
     private var mSelectFPList: ArrayList<SelectFieldPlaceEntity> = ArrayList()
     private var mSelectDay = 2
+
+    private var mShowMsgList: ArrayList<ShowMsgEntity> = ArrayList()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -65,18 +66,20 @@ class BadmintonFragment : Fragment(), BadmintonActionHandler {
         binding.recyclerView.adapter = mAdapter
         binding.startTime = dateFormatterUtil.getAutoStartTimeString()
         binding.selectTime = dateFormatterUtil.getDayFieldPlaceTimeWeek(mSelectDay)
-        subscribeRecyclerUI()
         return binding.root
     }
 
     private fun subscribeRecyclerUI() {
-        msgList.observe(viewLifecycleOwner, EventObserver {
-            mAdapter.submitList(it)
-        })
+        mAdapter.submitList(mShowMsgList)
+        mAdapter.notifyDataSetChanged()
+        recyclerViewUtil.scrollTo(binding.recyclerView)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        if (mRefreshStatusUtil == null) mRefreshStatusUtil = RefreshStatusUtil(context, this)
+        mRefreshStatusUtil!!.start()
+        onActionCBZ2(true)
         observe()
     }
 
@@ -90,6 +93,19 @@ class BadmintonFragment : Fragment(), BadmintonActionHandler {
             if (uiModel.showMsg != null && !uiModel.showMsg.hasBeenHandled) {
                 uiModel.showMsg.getContentIfNotHandled()?.let {
                     Log.d("TAG", it)
+                    mShowMsgList.add(ShowMsgEntity(it, false))
+                    subscribeRecyclerUI()
+                    onAction3()
+                }
+            }
+
+            if (uiModel.reLogin != null && !uiModel.reLogin.hasBeenHandled) {
+                uiModel.reLogin.getContentIfNotHandled()?.let {
+                    if (it) {
+                        mShowMsgList.add(ShowMsgEntity("已经掉线，正在重新登录...", false))
+                        subscribeRecyclerUI()
+                        viewModel.login()
+                    }
                 }
             }
         })
@@ -108,7 +124,18 @@ class BadmintonFragment : Fragment(), BadmintonActionHandler {
                         if (element.priceList[i].status == "0") {
                             if (mSelectFPList.size >= 2) {
                                 //场地选择成功
+                                mShowMsgList.add(ShowMsgEntity("场地选择成功，正在提交订单...", false))
+                                subscribeRecyclerUI()
+                                onAction5()
+                                return@EventObserver
                             } else {
+                                mShowMsgList.add(
+                                    ShowMsgEntity(
+                                        element.fieldName + " 可选，加入场地池中...",
+                                        false
+                                    )
+                                )
+                                subscribeRecyclerUI()
                                 mSelectFPList.add(
                                     SelectFieldPlaceEntity(
                                         fieldId = element.id,
@@ -119,6 +146,8 @@ class BadmintonFragment : Fragment(), BadmintonActionHandler {
 
                         } else {
                             //场地不可用
+                            mShowMsgList.add(ShowMsgEntity(element.fieldName + " 不可选...", false))
+                            subscribeRecyclerUI()
                         }
 
                     }
@@ -126,27 +155,12 @@ class BadmintonFragment : Fragment(), BadmintonActionHandler {
                 }
             }
         })
-    }
 
-    companion object {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        private const val ARG_SECTION_NUMBER = "section_number"
-
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
-        @JvmStatic
-        fun newInstance(sectionNumber: Int): BadmintonFragment {
-            return BadmintonFragment().apply {
-                arguments = Bundle().apply {
-                    putInt(ARG_SECTION_NUMBER, sectionNumber)
-                }
-            }
-        }
+        viewModel.resultSubmitOrder.observe(viewLifecycleOwner, EventObserver {
+            mSelectFPList.clear()
+            mShowMsgList.add(ShowMsgEntity(it.showMsg, it.isSuccess))
+            subscribeRecyclerUI()
+        })
     }
 
     override fun onAction1() {
@@ -158,7 +172,9 @@ class BadmintonFragment : Fragment(), BadmintonActionHandler {
     }
 
     override fun onAction3() {
-        viewModel.getPlaceList(dateFormatterUtil.getDayFieldPlaceTime(mSelectDay))
+        if (isStartNet) {
+            viewModel.getPlaceList(dateFormatterUtil.getDayFieldPlaceTime(mSelectDay))
+        }
     }
 
     override fun onAction5() {
@@ -178,6 +194,7 @@ class BadmintonFragment : Fragment(), BadmintonActionHandler {
         binding.mcB5 = !checked
         if (checked) {
             mSelectDay = 2
+//            _msgList.postValue(Event())
         }
         binding.selectTime = dateFormatterUtil.getDayFieldPlaceTimeWeek(mSelectDay)
     }
@@ -190,4 +207,58 @@ class BadmintonFragment : Fragment(), BadmintonActionHandler {
         }
         binding.selectTime = dateFormatterUtil.getDayFieldPlaceTimeWeek(mSelectDay)
     }
+
+    private val mHandler: Handler = object : Handler(Looper.getMainLooper()) {
+        override fun handleMessage(msg: Message) {
+            when (msg.what) {
+                MSG_TEST -> {
+                }
+                MSG_TIME_REFRESH -> {
+                    mShowMsgList.add(ShowMsgEntity(dateFormatterUtil.getCurrentTimeString(), false))
+                    subscribeRecyclerUI()
+                }
+            }
+        }
+    }
+
+    private var isStartNet = false
+    override fun onRefreshStatus() {
+        if (dateFormatterUtil.getCurrentTimeLong() >= dateFormatterUtil.getAutoSelectTImeLong()) {
+            isStartNet = true
+            onAction3()
+            mRefreshStatusUtil!!.release()
+        } else {
+            isStartNet = false
+            if (dateFormatterUtil.getCurrentTimeLong() == dateFormatterUtil.getAutoSelectCheckTimeLong()) {
+                onAction1()
+            } else {
+                mHandler.sendEmptyMessage(MSG_TIME_REFRESH)
+            }
+        }
+    }
+
+    companion object {
+        /**
+         * The fragment argument representing the section number for this
+         * fragment.
+         */
+        private const val ARG_SECTION_NUMBER = "section_number"
+        const val MSG_TEST = -1
+        const val MSG_TIME_REFRESH = 1
+
+        /**
+         * Returns a new instance of this fragment for the given section
+         * number.
+         */
+        @JvmStatic
+        fun newInstance(sectionNumber: Int): BadmintonFragment {
+            return BadmintonFragment().apply {
+                arguments = Bundle().apply {
+                    putInt(ARG_SECTION_NUMBER, sectionNumber)
+                }
+            }
+        }
+    }
+
+
 }

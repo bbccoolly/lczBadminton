@@ -9,5 +9,6 @@ import java.io.Serializable
  * create by Arrow on 2020-11-06
  */
 data class ShowMsgEntity(
-    var showMsg: String
+    var showMsg: String,
+    var isSuccess: Boolean
 ) : Serializable

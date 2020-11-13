@@ -54,6 +54,17 @@ class DateFormatterUtil @Inject constructor() {
         return formatter2.parse(getAutoStartTimeString()).time
     }
 
+    //自动抢单时间
+    private fun getAutoStartCheckTimeString(): String {
+        val calendar = Calendar.getInstance()
+        val time = calendar.time
+        return formatter2.format(time) + " 08:59:55"
+    }
+    //获取当前订单开始时间
+    fun getAutoSelectCheckTimeLong(): Long {
+        return formatter2.parse(getAutoStartCheckTimeString()).time
+    }
+
     //获取某天场地信息
     fun getDayFieldPlaceTime(type: Int): String {
         val calendar = Calendar.getInstance()

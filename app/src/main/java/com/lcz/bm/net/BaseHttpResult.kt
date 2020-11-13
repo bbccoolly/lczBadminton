@@ -17,7 +17,11 @@ class BaseHttpResult<T> : Serializable {
     val isSuccess: Boolean
         get() = SUCCESS_CODE == code
 
+    val isReLogin: Boolean
+        get() = SUCCESS_RELOGIN == code
+
     companion object {
         private const val SUCCESS_CODE = 900
+        private const val SUCCESS_RELOGIN = 906
     }
 }

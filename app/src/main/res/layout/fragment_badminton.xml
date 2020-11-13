@@ -16,9 +16,11 @@
         <variable
             name="selectTime"
             type="String" />
+
         <variable
             name="mCB2"
             type="Boolean" />
+
         <variable
             name="mCB5"
             type="Boolean" />
@@ -55,14 +57,14 @@
         </com.google.android.material.card.MaterialCardView>
 
         <com.google.android.material.checkbox.MaterialCheckBox
-            android:checked="true"
-            android:clickable="false"
             android:id="@+id/checkBox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginLeft="8dp"
             android:layout_marginTop="8dp"
+            android:checked="true"
+            android:clickable="false"
             android:onCheckedChanged="@{(v,checked)->actionHandler.onActionCBDS(checked)}"
             android:text="定时抢"
             android:textColor="@color/purple_200"
@@ -114,12 +116,24 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginLeft="8dp"
-            android:checked="@{mCB5}"
             android:layout_marginTop="8dp"
+            android:checked="@{mCB5}"
             android:onCheckedChanged="@{(v,checked)->actionHandler.onActionCBZ5(checked)}"
             android:text="周五晚8点"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/checkBox2" />
+
+        <Button
+            android:id="@+id/button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:onClick="@{()->actionHandler.onAction1()}"
+            android:text="获取订单列表"
+            app:layout_constraintBottom_toBottomOf="@+id/checkBox3"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/checkBox3" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

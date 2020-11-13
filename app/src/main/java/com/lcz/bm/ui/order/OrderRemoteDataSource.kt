@@ -27,7 +27,7 @@ class OrderRemoteDataSource @Inject constructor(
         errorMessage = "网络连接异常"
     )
 
-    suspend fun submitOrder(token: String,submitEntity: SubmitEntity) = safeApiCall(
+    suspend fun submitOrder(token: String, submitEntity: SubmitEntity) = safeApiCall(
         call = { requestSubmitOrder(token, submitEntity) },
         errorMessage = "网络连接异常"
     )
@@ -47,10 +47,17 @@ class OrderRemoteDataSource @Inject constructor(
         if (response.isSuccessful) {
             val result = response.body()
             if (result != null) {
-                return if (result.code == 900) {
-                    Result.Success(data = result)
-                } else {
-                    Result.Error(IOException(result.msg))
+                when (result.code) {
+                    900 -> {
+                        return Result.Success(data = result)
+
+                    }
+                    906 -> {
+                        return Result.ErrorReLogin(true, IOException(result.msg))
+                    }
+                    else -> {
+                        return Result.Error(IOException(result.msg))
+                    }
                 }
             }
         }
