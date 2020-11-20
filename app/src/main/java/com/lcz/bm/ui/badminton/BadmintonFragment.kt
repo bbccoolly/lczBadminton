@@ -194,22 +194,45 @@ class BadmintonFragment : Fragment(), BadmintonActionHandler,
     }
 
     override fun onActionCBZ2(checked: Boolean) {
-        binding.mcB2 = checked
-        binding.mcB5 = !checked
         if (checked) {
             mSelectDay = 2
-//            _msgList.postValue(Event())
+            updateCheckBoxStatus(mSelectDay)
         }
-        binding.selectTime = dateFormatterUtil.getDayFieldPlaceTimeWeek(mSelectDay)
     }
 
     override fun onActionCBZ5(checked: Boolean) {
-        binding.mcB2 = !checked
-        binding.mcB5 = checked
         if (checked) {
             mSelectDay = 5
+            updateCheckBoxStatus(mSelectDay)
         }
+    }
+
+    override fun onActionCBZ4(checked: Boolean) {
+        if (checked) {
+            mSelectDay = 4
+            updateCheckBoxStatus(mSelectDay)
+        }
+    }
+
+    private fun updateCheckBoxStatus(type: Int) {
         binding.selectTime = dateFormatterUtil.getDayFieldPlaceTimeWeek(mSelectDay)
+        when (type) {
+            2 -> {
+                binding.mcB2 = true
+                binding.mcB4 = false
+                binding.mcB5 = false
+            }
+            4 -> {
+                binding.mcB2 = false
+                binding.mcB4 = true
+                binding.mcB5 = false
+            }
+            5 -> {
+                binding.mcB2 = false
+                binding.mcB4 = false
+                binding.mcB5 = true
+            }
+        }
     }
 
     private val mHandler: Handler = object : Handler(Looper.getMainLooper()) {
@@ -234,8 +257,10 @@ class BadmintonFragment : Fragment(), BadmintonActionHandler,
 
     private var isStartNet = false
     private val calendar = Calendar.getInstance()
+
     @SuppressLint("SimpleDateFormat")
     private val formatter1 = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+
     @SuppressLint("SimpleDateFormat")
     private val formatter2 = SimpleDateFormat("yyyy-MM-dd")
 

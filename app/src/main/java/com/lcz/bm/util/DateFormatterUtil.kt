@@ -58,7 +58,7 @@ class DateFormatterUtil @Inject constructor() {
     fun getAutoStartCheckTimeString(): String {
         val calendar = Calendar.getInstance()
         val time = calendar.time
-        return formatter2.format(time) + " 08:59:55"
+        return formatter2.format(time) + " 08:59:50"
     }
 
     //获取当前订单开始时间
