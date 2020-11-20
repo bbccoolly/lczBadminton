@@ -113,20 +113,21 @@ class BadmintonFragment : Fragment(), BadmintonActionHandler,
                 }
             }
         })
-
+        var isGetNetData = false
         viewModel.placeInfo.observe(viewLifecycleOwner, EventObserver {
             val placeList = it.data
             val data = placeList[0]
             val fieldList = data.fieldList
             for (element in fieldList) {//场地
                 for (i in element.priceList.indices) {
-                    Log.d(
-                        "observe",
-                        "index i- " + i + " 场地号 id- " + element.id + " 时间段 id- " + element.priceList[i].id + " " + element.priceList[i].startTime + " " + element.priceList[i].status
-                    )
                     if (i == 22) {
+                        Log.d(
+                            "observe",
+                            "index i- " + i + " 场地号 id- " + element.id + " 时间段 id- " + element.priceList[i].id + " " + element.priceList[i].startTime + " " + element.priceList[i].status
+                        )
                         if (element.priceList[i].status == "0") {
                             if (mSelectFPList.size >= 2) {
+                                isGetNetData = true
                                 //场地选择成功
                                 mShowMsgList.add(ShowMsgEntity("场地选择成功，正在提交订单...", false))
                                 subscribeRecyclerUI()
@@ -147,11 +148,19 @@ class BadmintonFragment : Fragment(), BadmintonActionHandler,
                                     )
                                 )
                             }
-
                         } else {
                             //场地不可用
-                            mShowMsgList.add(ShowMsgEntity(element.fieldName + " 不可选...", false))
-                            subscribeRecyclerUI()
+                            mShowMsgList.add(
+                                ShowMsgEntity(
+                                    element.fieldName + " 不可选...",
+                                    false
+                                )
+                            )
+                            if (element.id == 287 && !isGetNetData && mSelectFPList.size > 0) {//最后一个场地 && 没有青丘国
+                                mShowMsgList.add(ShowMsgEntity("场地选择成功，正在提交订单...", false))
+                                subscribeRecyclerUI()
+                                onAction5()
+                            }
                         }
 
                     }
@@ -177,6 +186,7 @@ class BadmintonFragment : Fragment(), BadmintonActionHandler,
 
     override fun onAction3() {
         if (isStartNet) {
+            mSelectFPList.clear()
             viewModel.getPlaceList(dateFormatterUtil.getDayFieldPlaceTime(mSelectDay))
         }
     }
