@@ -24,8 +24,8 @@ class LoginRemoteDataSource @Inject constructor(
     private suspend fun requestLogin(): Result<LoginUserEntity> {
         val response = service.login(
             mapOf(
-                "phone" to "13530318471",
-                "password" to "meng520",
+                "phone" to "18925287073",//"13530318471",//18925287073
+                "password" to "412430",//"meng520",//412430
                 "inviteCode" to "",
                 "source" to "1",
                 "api_version" to "5",

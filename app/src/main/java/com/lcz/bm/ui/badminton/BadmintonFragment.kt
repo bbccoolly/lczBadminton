@@ -9,6 +9,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -55,7 +56,7 @@ class BadmintonFragment : Fragment(), BadmintonActionHandler,
     private var mRefreshStatusUtil: RefreshStatusUtil? = null
 
     private var mSelectFPList: ArrayList<SelectFieldPlaceEntity> = ArrayList()
-    private var mSelectDay = 2
+    private var mSelectDay = 4
 
     private var mShowMsgList: ArrayList<ShowMsgEntity> = ArrayList()
 
@@ -82,8 +83,14 @@ class BadmintonFragment : Fragment(), BadmintonActionHandler,
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if (mRefreshStatusUtil == null) mRefreshStatusUtil = RefreshStatusUtil(context, this)
-        mRefreshStatusUtil!!.start()
-        onActionCBZ2(true)
+        if (dateFormatterUtil.getCurrentTimeLong() > dateFormatterUtil.getAutoSelectTImeLong()) {
+            isStartNet = true
+            mShowMsgList.add(ShowMsgEntity("超过抢订时间,请点击手动下单", false))
+            subscribeRecyclerUI()
+        }else{
+            mRefreshStatusUtil!!.start()
+        }
+        onActionCBZ4(true)
         observe()
     }
 

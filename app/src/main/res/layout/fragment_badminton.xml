@@ -111,6 +111,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginLeft="8dp"
+                android:clickable="false"
                 android:layout_marginTop="8dp"
                 android:checked="@{mCB2}"
                 android:onCheckedChanged="@{(v,checked)->actionHandler.onActionCBZ2(checked)}"
@@ -132,6 +133,7 @@
 
             <com.google.android.material.checkbox.MaterialCheckBox
                 android:id="@+id/checkBox3"
+                android:clickable="false"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
@@ -150,7 +152,7 @@
                 android:layout_marginEnd="8dp"
                 android:layout_marginRight="8dp"
                 android:onClick="@{()->actionHandler.onAction3()}"
-                android:text="获取场地下单"
+                android:text="手动下单"
                 app:layout_constraintBottom_toBottomOf="@+id/button2"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/button2" />
@@ -163,7 +165,7 @@
                 android:layout_marginLeft="8dp"
                 android:layout_marginTop="8dp"
                 android:onClick="@{()->actionHandler.onAction1()}"
-                android:text="走登录流程"
+                android:text="登录下单"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView3" />
 
