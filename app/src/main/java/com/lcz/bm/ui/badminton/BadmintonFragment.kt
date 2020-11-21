@@ -51,7 +51,7 @@ class BadmintonFragment : Fragment(), BadmintonActionHandler,
     private var mRefreshStatusUtil: RefreshStatusUtil = RefreshStatusUtil(context, this)
 
     private var mSelectFPList: ArrayList<SelectFieldPlaceEntity> = ArrayList()
-    private var mSelectDay = 4
+    private var mSelectDay = 2
 
     private var mShowMsgList: ArrayList<ShowMsgEntity> = ArrayList()
 
@@ -77,6 +77,9 @@ class BadmintonFragment : Fragment(), BadmintonActionHandler,
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        prefs.phone = "13530318471"
+        prefs.password = "meng520"
+        binding.phone = "当前账号为 lcz " + prefs.phone
         if (dateFormatterUtil.getCurrentTimeLong() > dateFormatterUtil.getAutoSelectTImeLong()) {
             isStartNet = true
             mShowMsgList.add(ShowMsgEntity("超过抢订时间", false))
@@ -84,7 +87,7 @@ class BadmintonFragment : Fragment(), BadmintonActionHandler,
         } else {
             mRefreshStatusUtil.start()
         }
-        onActionCBZ4(true)
+        onActionCBZ2(true)
         observe()
     }
 
@@ -178,7 +181,20 @@ class BadmintonFragment : Fragment(), BadmintonActionHandler,
     }
 
     override fun onAction1() {
-        viewModel.checkTokenStatus()
+        prefs.phone = "13530318471"
+        prefs.password = "meng520"
+        binding.phone = "当前账号为 Lcz " + prefs.phone
+//        viewModel.checkTokenStatus()
+        viewModel.login()
+
+    }
+
+    override fun onAction11() {
+        prefs.phone = "18925287073"
+        prefs.password = "412430"
+        binding.phone = "当前账号为 Miya " + prefs.phone
+//        viewModel.checkTokenStatus()
+        viewModel.login()
     }
 
     override fun onAction2() {
@@ -256,8 +272,7 @@ class BadmintonFragment : Fragment(), BadmintonActionHandler,
                     subscribeRecyclerUI()
                 }
                 MSG_ACTION_1 -> {
-                    onAction1()
-
+                    viewModel.checkTokenStatus()
                 }
                 MSG_ACTION_3 -> {
                     onAction3()

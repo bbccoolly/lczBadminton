@@ -8,6 +8,7 @@ package com.lcz.bm.ui.badminton
  */
 interface BadmintonActionHandler {
     fun onAction1()
+    fun onAction11()
     fun onAction2()
     fun onAction3()
     fun onAction5()

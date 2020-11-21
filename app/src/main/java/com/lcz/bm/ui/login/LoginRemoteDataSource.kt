@@ -4,6 +4,7 @@ import com.lcz.bm.api.LczBMService
 import com.lcz.bm.entity.LoginUserEntity
 import com.lcz.bm.net.Result
 import com.lcz.bm.net.safeApiCall
+import com.lcz.bm.util.SharedPreferenceStorage
 import java.io.IOException
 import javax.inject.Inject
 
@@ -14,7 +15,8 @@ import javax.inject.Inject
  * create by Arrow on 2020-11-09
  */
 class LoginRemoteDataSource @Inject constructor(
-    private val service: LczBMService
+    private val service: LczBMService,
+    private val pref:SharedPreferenceStorage
 ) {
     suspend fun login() = safeApiCall(
         call = { requestLogin() },
@@ -24,8 +26,8 @@ class LoginRemoteDataSource @Inject constructor(
     private suspend fun requestLogin(): Result<LoginUserEntity> {
         val response = service.login(
             mapOf(
-                "phone" to "18925287073",//"13530318471",//18925287073
-                "password" to "412430",//"meng520",//412430
+                "phone" to pref.phone.toString(),//"13530318471",//18925287073
+                "password" to pref.password.toString(),//"meng520",//412430
                 "inviteCode" to "",
                 "source" to "1",
                 "api_version" to "5",
