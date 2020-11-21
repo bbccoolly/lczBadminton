@@ -1,5 +1,7 @@
 package com.lcz.bm.entity
 
+import java.io.Serializable
+
 /**
  *
  * desc: TODO
@@ -9,4 +11,4 @@ package com.lcz.bm.entity
 data class SelectFieldPlaceEntity(
     val fieldId: Int,//场地号 id
     val placeId: Int//时间段 id
-)
+) : Serializable

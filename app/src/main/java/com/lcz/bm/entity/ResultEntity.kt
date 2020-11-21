@@ -1,5 +1,7 @@
 package com.lcz.bm.entity
 
+import java.io.Serializable
+
 /**
  *
  * desc: TODO
@@ -11,4 +13,4 @@ data class ResultEntity(
     val isFree: String,
     val ordernum: String,
     val remainTime: String
-)
+) : Serializable

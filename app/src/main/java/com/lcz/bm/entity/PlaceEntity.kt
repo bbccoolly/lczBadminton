@@ -15,7 +15,7 @@ data class PlaceEntity(
     val msg: String,
     val pagenum: Any,
     val total: Any
-)
+) : Serializable
 
 data class Place(
     val coupons: List<Any>,
@@ -29,7 +29,7 @@ data class Place(
     val singleMinTime: Int,
     val type: String,
     val typeName: String
-)
+) : Serializable
 
 data class Field(
     val fieldName: String,
@@ -41,7 +41,7 @@ data class Field(
     val minSeriesHours: String,
     val parentFieldId: Any,
     val priceList: List<Price>
-)
+) : Serializable
 
 data class Price(
     val endTime: String,
@@ -50,4 +50,4 @@ data class Price(
     val seriesId: String,
     val startTime: String,
     val status: String
-)
+) : Serializable

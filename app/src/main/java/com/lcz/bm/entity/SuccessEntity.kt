@@ -1,5 +1,7 @@
 package com.lcz.bm.entity
 
+import java.io.Serializable
+
 /**
  *
  * desc: TODO
@@ -13,4 +15,4 @@ data class SuccessEntity(
     val msg: String,
     val pagenum: Int,
     val total: Any
-)
+) : Serializable

@@ -1,5 +1,7 @@
 package com.lcz.bm.entity
 
+import java.io.Serializable
+
 /**
  *
  * desc: 校验场地
@@ -11,4 +13,4 @@ data class CheckSelectEntity(
     val fieldHours: String,
     val fieldMaxHours: String,
     val orderHours: String
-)
+) : Serializable
