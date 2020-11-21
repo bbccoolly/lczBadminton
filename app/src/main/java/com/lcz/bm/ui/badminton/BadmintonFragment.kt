@@ -53,7 +53,7 @@ class BadmintonFragment : Fragment(), BadmintonActionHandler,
     @Inject
     lateinit var recyclerViewUtil: RecyclerViewUtil
 
-    private var mRefreshStatusUtil: RefreshStatusUtil? = null
+    private var mRefreshStatusUtil: RefreshStatusUtil = RefreshStatusUtil(context, this)
 
     private var mSelectFPList: ArrayList<SelectFieldPlaceEntity> = ArrayList()
     private var mSelectDay = 4
@@ -82,13 +82,12 @@ class BadmintonFragment : Fragment(), BadmintonActionHandler,
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        if (mRefreshStatusUtil == null) mRefreshStatusUtil = RefreshStatusUtil(context, this)
         if (dateFormatterUtil.getCurrentTimeLong() > dateFormatterUtil.getAutoSelectTImeLong()) {
             isStartNet = true
-            mShowMsgList.add(ShowMsgEntity("超过抢订时间,请点击手动下单", false))
+            mShowMsgList.add(ShowMsgEntity("超过抢订时间", false))
             subscribeRecyclerUI()
-        }else{
-            mRefreshStatusUtil!!.start()
+        } else {
+            mRefreshStatusUtil.start()
         }
         onActionCBZ4(true)
         observe()
@@ -282,8 +281,8 @@ class BadmintonFragment : Fragment(), BadmintonActionHandler,
     private val formatter2 = SimpleDateFormat("yyyy-MM-dd")
 
     override fun onRefreshStatus() {
-        if (dateFormatterUtil.getCurrentTimeLong() >= dateFormatterUtil.getAutoSelectTImeLong()) {
-            mRefreshStatusUtil!!.release()
+        if (dateFormatterUtil.getCurrentTimeLong() == dateFormatterUtil.getAutoSelectTImeLong()) {
+            mRefreshStatusUtil.release()
             isStartNet = true
             mHandler.sendEmptyMessage(MSG_ACTION_3)
         } else {
