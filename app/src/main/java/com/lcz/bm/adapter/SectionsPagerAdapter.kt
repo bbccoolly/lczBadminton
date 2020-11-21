@@ -1,28 +1,40 @@
 package com.lcz.bm.adapter
 
 import android.content.Context
+import android.util.Log
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
 import com.lcz.bm.R
 import com.lcz.bm.ui.badminton.BadmintonFragment
+import com.lcz.bm.ui.badminton2.Badminton2Fragment
 
 private val TAB_TITLES = arrayOf(
-        R.string.tab_text_1,
-        R.string.tab_text_2
+    R.string.tab_text_1,
+    R.string.tab_text_2
 )
 
 /**
  * A [FragmentPagerAdapter] that returns a fragment corresponding to
  * one of the sections/tabs/pages.
  */
-class SectionsPagerAdapter(private val context: Context, fm: FragmentManager)
-    : FragmentPagerAdapter(fm) {
+class SectionsPagerAdapter(private val context: Context, fm: FragmentManager) :
+    FragmentPagerAdapter(fm) {
 
     override fun getItem(position: Int): Fragment {
         // getItem is called to instantiate the fragment for the given page.
         // Return a PlaceholderFragment (defined as a static inner class below).
-        return BadmintonFragment.newInstance(position + 1)
+        return when (position) {
+            0 -> {
+                BadmintonFragment.newInstance(position)
+            }
+            1 -> {
+                Badminton2Fragment.newInstance(position)
+            }
+            else -> {
+                BadmintonFragment.newInstance(position)
+            }
+        }
     }
 
     override fun getPageTitle(position: Int): CharSequence? {

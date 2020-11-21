@@ -1,6 +1,5 @@
 package com.lcz.bm.ui.badminton
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -9,7 +8,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -20,10 +18,7 @@ import com.lcz.bm.entity.ShowMsgEntity
 import com.lcz.bm.net.EventObserver
 import com.lcz.bm.util.*
 import dagger.hilt.android.AndroidEntryPoint
-import java.text.SimpleDateFormat
-import java.util.*
 import javax.inject.Inject
-import kotlin.collections.ArrayList
 
 /**
  *
@@ -274,7 +269,7 @@ class BadmintonFragment : Fragment(), BadmintonActionHandler,
     private var isStartNet = false
 
     override fun onRefreshStatus() {
-        if (dateFormatterUtil.getCurrentTimeLong() == dateFormatterUtil.getAutoSelectTImeLong()) {
+        if (dateFormatterUtil.getCurrentTimeLong() >= dateFormatterUtil.getAutoSelectTImeLong()) {
             mRefreshStatusUtil.release()
             isStartNet = true
             mHandler.sendEmptyMessage(MSG_ACTION_3)

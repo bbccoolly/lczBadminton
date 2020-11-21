@@ -1,6 +1,7 @@
 package com.lcz.bm.util;
 
 import android.content.Context;
+import android.util.Log;
 
 /**
  * Created by oyty on 11/14/17.
@@ -25,27 +26,27 @@ public class RefreshStatusUtil {
         stopQueryPrice();
         mStatusTask = new Thread(QueryRunnable);
         mStatusTask.start();
+
     }
 
     private final Runnable QueryRunnable = new Runnable() {
         @Override
         public void run() {
             while (!Thread.currentThread().isInterrupted()) {
-                try {
-                    queryStatus();
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-//                if (System.currentTimeMillis() - startPriceTime > 1000) {
-//                    startPriceTime = System.currentTimeMillis();
-//                    try {
-//                        Thread.sleep(30000);
-//                        queryStatus();
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
+//                try {
+//                    queryStatus();
+//                    Thread.sleep(1000);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
 //                }
+                if (System.currentTimeMillis() - startPriceTime > 1000) {
+                    startPriceTime = System.currentTimeMillis();
+                    try {
+                        queryStatus();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
             }
         }
     };

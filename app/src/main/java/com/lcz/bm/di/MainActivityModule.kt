@@ -2,7 +2,6 @@ package com.lcz.bm.di
 
 import android.content.Context
 import com.lcz.bm.util.GsonUtil
-import com.lcz.bm.util.RefreshStatusUtil
 import com.lcz.bm.util.SharedPreferenceStorage
 import dagger.Module
 import dagger.Provides
