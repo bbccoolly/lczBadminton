@@ -55,7 +55,7 @@ class DateFormatterUtil @Inject constructor() {
     }
 
     //自动抢单时间
-    fun getAutoStartCheckTimeString(): String {
+    private fun getAutoStartCheckTimeString(): String {
         val calendar = Calendar.getInstance()
         val time = calendar.time
         return formatter2.format(time) + " 08:59:50"

@@ -272,13 +272,6 @@ class BadmintonFragment : Fragment(), BadmintonActionHandler,
     }
 
     private var isStartNet = false
-    private val calendar = Calendar.getInstance()
-
-    @SuppressLint("SimpleDateFormat")
-    private val formatter1 = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-
-    @SuppressLint("SimpleDateFormat")
-    private val formatter2 = SimpleDateFormat("yyyy-MM-dd")
 
     override fun onRefreshStatus() {
         if (dateFormatterUtil.getCurrentTimeLong() == dateFormatterUtil.getAutoSelectTImeLong()) {
