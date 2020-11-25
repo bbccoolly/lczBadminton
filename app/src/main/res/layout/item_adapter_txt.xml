@@ -6,8 +6,8 @@
     <data>
 
         <variable
-            name="entity"
-            type="com.lcz.bm.entity.ShowMsgEntity" />
+            name="showMsg"
+            type="String" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -18,7 +18,7 @@
             android:id="@+id/textView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@{entity.showMsg}"
+            android:text="@{showMsg}"
             android:textSize="12sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

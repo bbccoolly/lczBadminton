@@ -6,7 +6,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.lcz.bm.databinding.ItemAdapterTxtBinding
-import com.lcz.bm.entity.ShowMsgEntity
 import javax.inject.Inject
 
 /**
@@ -15,7 +14,7 @@ import javax.inject.Inject
  *
  * create by Arrow on 2020-11-11
  */
-class RecyclerMsgAdapter @Inject constructor() :  ListAdapter<ShowMsgEntity, RecyclerView.ViewHolder>(PlantDiffCallback()) {
+class RecyclerMsgAdapter @Inject constructor() :  ListAdapter<String, RecyclerView.ViewHolder>(PlantDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return RViewHolder(
@@ -34,9 +33,9 @@ class RecyclerMsgAdapter @Inject constructor() :  ListAdapter<ShowMsgEntity, Rec
 
     class RViewHolder(private val binding: ItemAdapterTxtBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(item: ShowMsgEntity) {
+        fun bind(item: String) {
             binding.apply {
-                entity = item
+                showMsg = item
                 executePendingBindings()
             }
         }
@@ -44,13 +43,13 @@ class RecyclerMsgAdapter @Inject constructor() :  ListAdapter<ShowMsgEntity, Rec
 
 }
 
-private class PlantDiffCallback : DiffUtil.ItemCallback<ShowMsgEntity>() {
+private class PlantDiffCallback : DiffUtil.ItemCallback<String>() {
 
-    override fun areItemsTheSame(oldItem: ShowMsgEntity, newItem: ShowMsgEntity): Boolean {
-        return oldItem.showMsg == newItem.showMsg
+    override fun areItemsTheSame(oldItem: String, newItem: String): Boolean {
+        return oldItem == newItem
     }
 
-    override fun areContentsTheSame(oldItem: ShowMsgEntity, newItem: ShowMsgEntity): Boolean {
+    override fun areContentsTheSame(oldItem: String, newItem: String): Boolean {
         return oldItem == newItem
     }
 }

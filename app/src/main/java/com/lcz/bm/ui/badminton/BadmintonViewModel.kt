@@ -1,13 +1,11 @@
 package com.lcz.bm.ui.badminton
 
-import android.util.Log
 import androidx.hilt.Assisted
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import com.lcz.bm.data.LogDao
 import com.lcz.bm.entity.LoginUserEntity
 import com.lcz.bm.entity.PlaceEntity
-import com.lcz.bm.entity.ShowMsgEntity
 import com.lcz.bm.entity.SubmitEntity
 import com.lcz.bm.net.Event
 import com.lcz.bm.net.Result
@@ -36,22 +34,24 @@ class BadmintonViewModel @ViewModelInject internal constructor(
     private val dispatcherProvider: CoroutinesDispatcherProvider
 ) : ViewModel() {
 
-    private val _loginInfo = MutableLiveData<Event<LoginUserEntity>>()
-    val loginInfo: LiveData<Event<LoginUserEntity>> = _loginInfo
+    private val _resultCheckStatus = MutableLiveData<Event<Boolean>>()
+    val resultCheckStatus: LiveData<Event<Boolean>> = _resultCheckStatus
 
-    private val _placeInfo = MutableLiveData<Event<PlaceEntity>>()
-    val placeInfo: LiveData<Event<PlaceEntity>> = _placeInfo
+    private val _resultLoginInfo = MutableLiveData<Event<LoginUserEntity>>()
+    val resultLoginInfo: LiveData<Event<LoginUserEntity>> = _resultLoginInfo
 
-    private val _resultSubmitOrder = MutableLiveData<Event<ShowMsgEntity>>()
-    val resultSubmitOrder: LiveData<Event<ShowMsgEntity>> = _resultSubmitOrder
+    private val _resultPlaceInfo = MutableLiveData<Event<PlaceEntity>>()
+    val resultPlaceInfo: LiveData<Event<PlaceEntity>> = _resultPlaceInfo
 
-    private val _uiState = MutableLiveData<LoginUiModel>()
-    val uiState: LiveData<LoginUiModel> = _uiState
+    private val _resultSubmitOrder = MutableLiveData<Event<String>>()
+    val resultSubmitOrder: LiveData<Event<String>> = _resultSubmitOrder
+
+    private val _uiState = MutableLiveData<BMUiModel>()
+    val uiState: LiveData<BMUiModel> = _uiState
 
     private var netJob1: Job? = null
     private var netJob2: Job? = null
     private var netJob3: Job? = null
-    private var netJob4: Job? = null
     private var netJob5: Job? = null
 
     //校验场地 1
@@ -89,21 +89,16 @@ class BadmintonViewModel @ViewModelInject internal constructor(
 
     private fun launchCheckToken(): Job? {
         return viewModelScope.launch(dispatcherProvider.computation) {
-            withContext(dispatcherProvider.main) {
-                emitUiState(isLoading = Event(true))
-            }
             val result = orderRemoteDataSource.getOrderList(prefs.token.toString())
             withContext(dispatcherProvider.main) {
                 if (result is Result.Success) {
+                    _resultCheckStatus.postValue(Event(false))
                     emitUiState(
-                        isLoading = Event(false),
-                        isResultSuccess = Event(true),
                         showMsg = Event(content = "登录状态校验成功")
                     )
                 } else {
+                    _resultCheckStatus.postValue(Event((result as Result.ErrorReLogin).reLogin))
                     emitUiState(
-                        reLogin = Event((result as Result.ErrorReLogin).reLogin),
-                        isLoading = Event(false),
                         showMsg = Event(
                             content = (result as? Result.Error)?.exception?.message ?: ""
                         )
@@ -115,21 +110,15 @@ class BadmintonViewModel @ViewModelInject internal constructor(
 
     private fun launchLogin(): Job? {
         return viewModelScope.launch(dispatcherProvider.computation) {
-            withContext(dispatcherProvider.main) {
-                emitUiState(isLoading = Event(true))
-            }
             val result = loginRemoteDataSource.login()
             withContext(dispatcherProvider.main) {
                 if (result is Result.Success) {
-                    _loginInfo.postValue(Event(result.data))
+                    _resultLoginInfo.postValue(Event(result.data))
                     emitUiState(
-                        isLoading = Event(false),
-                        isResultSuccess = Event(true),
                         showMsg = Event(content = "登录成功")
                     )
                 } else {
                     emitUiState(
-                        isLoading = Event(false),
                         showMsg = Event(
                             content = (result as? Result.Error)?.exception?.message ?: ""
                         )
@@ -144,15 +133,12 @@ class BadmintonViewModel @ViewModelInject internal constructor(
             val result = placeRemoteDataSource.getPlaceList(prefs.token.toString(), time)
             withContext(dispatcherProvider.main) {
                 if (result is Result.Success) {
-                    _placeInfo.postValue(Event(result.data))
+                    _resultPlaceInfo.postValue(Event(result.data))
                     emitUiState(
-                        isLoading = Event(false),
-                        isResultSuccess = Event(true),
                         showMsg = Event(content = "场地获取成功")
                     )
                 } else {
                     emitUiState(
-                        isLoading = Event(false),
                         showMsg = Event(
                             content = (result as? Result.Error)?.exception?.message ?: ""
                         )
@@ -167,21 +153,21 @@ class BadmintonViewModel @ViewModelInject internal constructor(
             val result = orderRemoteDataSource.submitOrder(prefs.token.toString(), submitEntity)
             withContext(dispatcherProvider.main) {
                 if (result is Result.Success) {
-                    _resultSubmitOrder.postValue(Event(ShowMsgEntity("下单成功，请前往支付",true)))
+                    _resultSubmitOrder.postValue(Event("下单成功，请前往支付"))
                 } else {
-                    _resultSubmitOrder.postValue(Event(ShowMsgEntity((result as? Result.Error)?.exception?.message ?: "",true)))
+                    _resultSubmitOrder.postValue(
+                        Event((result as? Result.Error)?.exception?.message ?: "")
+                    )
                 }
             }
         }
     }
 
     private fun emitUiState(
-        isLoading: Event<Boolean>? = null,
-        isResultSuccess: Event<Boolean>? = null,
         showMsg: Event<String>? = null,
         reLogin: Event<Boolean>? = null
     ) {
-        val uiModel = LoginUiModel(isLoading, isResultSuccess, showMsg, reLogin)
+        val uiModel = BMUiModel(showMsg, reLogin)
         _uiState.value = uiModel
     }
 
@@ -192,9 +178,7 @@ class BadmintonViewModel @ViewModelInject internal constructor(
 
 }
 
-data class LoginUiModel(
-    val isLoading: Event<Boolean>?,
-    val isResultSuccess: Event<Boolean>?,
+data class BMUiModel(
     val showMsg: Event<String>?,
     val reLogin: Event<Boolean>?
 )

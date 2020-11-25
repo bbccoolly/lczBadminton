@@ -14,7 +14,6 @@ import androidx.lifecycle.Observer
 import com.lcz.bm.adapter.RecyclerMsgAdapter
 import com.lcz.bm.databinding.FragmentBadmintonBinding
 import com.lcz.bm.entity.SelectFieldPlaceEntity
-import com.lcz.bm.entity.ShowMsgEntity
 import com.lcz.bm.net.EventObserver
 import com.lcz.bm.util.*
 import dagger.hilt.android.AndroidEntryPoint
@@ -53,7 +52,7 @@ class BadmintonFragment : Fragment(), BadmintonActionHandler,
     private var mSelectFPList: ArrayList<SelectFieldPlaceEntity> = ArrayList()
     private var mSelectDay = 2
 
-    private var mShowMsgList: ArrayList<ShowMsgEntity> = ArrayList()
+    private var mShowMsgList: ArrayList<String> = ArrayList()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -61,7 +60,6 @@ class BadmintonFragment : Fragment(), BadmintonActionHandler,
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentBadmintonBinding.inflate(inflater, container, false)
-        context ?: return binding.root
         binding.actionHandler = this
         binding.recyclerView.adapter = mAdapter
         binding.startTime = dateFormatterUtil.getAutoStartTimeString()
@@ -69,7 +67,8 @@ class BadmintonFragment : Fragment(), BadmintonActionHandler,
         return binding.root
     }
 
-    private fun subscribeRecyclerUI() {
+    private fun subscribeRecyclerUI(string: String) {
+        mShowMsgList.add(string)
         mAdapter.submitList(mShowMsgList)
         mAdapter.notifyDataSetChanged()
         recyclerViewUtil.scrollTo(binding.recyclerView)
@@ -79,11 +78,12 @@ class BadmintonFragment : Fragment(), BadmintonActionHandler,
         super.onViewCreated(view, savedInstanceState)
         prefs.phone = "13530318471"
         prefs.password = "meng520"
-        binding.phone = "当前账号为 lcz " + prefs.phone
+//        prefs.phone = "18925287073"
+//        prefs.password = "412430"
+        binding.phone = "当前账号："+prefs.phone
         if (dateFormatterUtil.getCurrentTimeLong() > dateFormatterUtil.getAutoSelectTImeLong()) {
             isStartNet = true
-            mShowMsgList.add(ShowMsgEntity("超过抢订时间", false))
-            subscribeRecyclerUI()
+            subscribeRecyclerUI("超过抢订时间")
         } else {
             mRefreshStatusUtil.start()
         }
@@ -92,33 +92,23 @@ class BadmintonFragment : Fragment(), BadmintonActionHandler,
     }
 
     private fun observe() {
-        viewModel.loginInfo.observe(viewLifecycleOwner, EventObserver {
-            prefs.token = it.token
+        //校验登录状态
+        viewModel.resultCheckStatus.observe(viewLifecycleOwner, EventObserver {
+            if (it) {
+                viewModel.login()
+            } else {
+                onActionXD()
+            }
         })
 
-        viewModel.uiState.observe(viewLifecycleOwner, Observer { it ->
-            val uiModel = it ?: return@Observer
-            if (uiModel.showMsg != null && !uiModel.showMsg.hasBeenHandled) {
-                uiModel.showMsg.getContentIfNotHandled()?.let {
-                    Log.d("TAG", it)
-                    mShowMsgList.add(ShowMsgEntity(it, false))
-                    subscribeRecyclerUI()
-                    onAction3()
-                }
-            }
-
-            if (uiModel.reLogin != null && !uiModel.reLogin.hasBeenHandled) {
-                uiModel.reLogin.getContentIfNotHandled()?.let {
-                    if (it) {
-                        mShowMsgList.add(ShowMsgEntity("已经掉线，正在重新登录...", false))
-                        subscribeRecyclerUI()
-                        viewModel.login()
-                    }
-                }
-            }
+        //登录
+        viewModel.resultLoginInfo.observe(viewLifecycleOwner, EventObserver {
+            prefs.token = it.token
+            onActionXD()
         })
         var isGetNetData = false
-        viewModel.placeInfo.observe(viewLifecycleOwner, EventObserver {
+        //场地列表
+        viewModel.resultPlaceInfo.observe(viewLifecycleOwner, EventObserver {
             val placeList = it.data
             val data = placeList[0]
             val fieldList = data.fieldList
@@ -133,18 +123,11 @@ class BadmintonFragment : Fragment(), BadmintonActionHandler,
                             if (mSelectFPList.size >= 2) {
                                 isGetNetData = true
                                 //场地选择成功
-                                mShowMsgList.add(ShowMsgEntity("场地选择成功，正在提交订单...", false))
-                                subscribeRecyclerUI()
-                                onAction5()
+                                subscribeRecyclerUI("场地选择成功，正在提交订单...")
+                                submitOrder()
                                 return@EventObserver
                             } else {
-                                mShowMsgList.add(
-                                    ShowMsgEntity(
-                                        element.fieldName + " 可选，加入场地池中...",
-                                        false
-                                    )
-                                )
-                                subscribeRecyclerUI()
+                                subscribeRecyclerUI(element.fieldName + " 可选，加入场地池中...")
                                 mSelectFPList.add(
                                     SelectFieldPlaceEntity(
                                         fieldId = element.id,
@@ -154,16 +137,14 @@ class BadmintonFragment : Fragment(), BadmintonActionHandler,
                             }
                         } else {
                             //场地不可用
-                            mShowMsgList.add(
-                                ShowMsgEntity(
-                                    element.fieldName + " 不可选...",
-                                    false
-                                )
-                            )
-                            if (element.id == 287 && !isGetNetData && mSelectFPList.size > 0) {//最后一个场地 && 没有青丘国
-                                mShowMsgList.add(ShowMsgEntity("场地选择成功，正在提交订单...", false))
-                                subscribeRecyclerUI()
-                                onAction5()
+                            mShowMsgList.add(element.fieldName + " 不可选...")
+                            if (element.id == 287) {//最后一个场地 && 没有青丘国
+                                if (!isGetNetData && mSelectFPList.size > 0) {
+                                    subscribeRecyclerUI("场地选择成功，正在提交订单...")
+                                    submitOrder()
+                                } else {
+                                    subscribeRecyclerUI("没有可选场地...")
+                                }
                             }
                         }
 
@@ -172,43 +153,45 @@ class BadmintonFragment : Fragment(), BadmintonActionHandler,
                 }
             }
         })
-
+        //提交订单结果
         viewModel.resultSubmitOrder.observe(viewLifecycleOwner, EventObserver {
             mSelectFPList.clear()
-            mShowMsgList.add(ShowMsgEntity(it.showMsg, it.isSuccess))
-            subscribeRecyclerUI()
+            subscribeRecyclerUI(it)
+        })
+
+        // showMsg
+        viewModel.uiState.observe(viewLifecycleOwner, Observer { it ->
+            val uiModel = it ?: return@Observer
+            if (uiModel.showMsg != null && !uiModel.showMsg.hasBeenHandled) {
+                uiModel.showMsg.getContentIfNotHandled()?.let {
+                    Log.d("TAG", it)
+                    subscribeRecyclerUI(it)
+                }
+            }
+
+            if (uiModel.reLogin != null && !uiModel.reLogin.hasBeenHandled) {
+                uiModel.reLogin.getContentIfNotHandled()?.let {
+                    if (it) {
+                        subscribeRecyclerUI("已经掉线，正在重新登录...")
+                        viewModel.login()
+                    }
+                }
+            }
         })
     }
 
-    override fun onAction1() {
-        prefs.phone = "13530318471"
-        prefs.password = "meng520"
-        binding.phone = "当前账号为 Lcz " + prefs.phone
-//        viewModel.checkTokenStatus()
-        viewModel.login()
-
-    }
-
-    override fun onAction11() {
-        prefs.phone = "18925287073"
-        prefs.password = "412430"
-        binding.phone = "当前账号为 Miya " + prefs.phone
-//        viewModel.checkTokenStatus()
+    override fun onActionLoginXD() {
         viewModel.login()
     }
 
-    override fun onAction2() {
-        viewModel.login()
-    }
-
-    override fun onAction3() {
+    override fun onActionXD() {
         if (isStartNet) {
             mSelectFPList.clear()
             viewModel.getPlaceList(dateFormatterUtil.getDayFieldPlaceTime(mSelectDay))
         }
     }
 
-    override fun onAction5() {
+    private fun submitOrder() {
         viewModel.submitOrder(
             provideOrderDataUtil.providePlaceData(
                 mSelectFPList,
@@ -268,14 +251,13 @@ class BadmintonFragment : Fragment(), BadmintonActionHandler,
                 MSG_TEST -> {
                 }
                 MSG_TIME_REFRESH -> {
-                    mShowMsgList.add(ShowMsgEntity(dateFormatterUtil.getCurrentTimeString(), false))
-                    subscribeRecyclerUI()
+                    subscribeRecyclerUI(dateFormatterUtil.getCurrentTimeString())
                 }
                 MSG_ACTION_1 -> {
                     viewModel.checkTokenStatus()
                 }
                 MSG_ACTION_3 -> {
-                    onAction3()
+                    onActionXD()
                 }
             }
         }

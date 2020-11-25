@@ -165,8 +165,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
                 android:layout_marginRight="8dp"
-                android:onClick="@{()->actionHandler.onAction3()}"
-                android:text="手动下单"
+                android:onClick="@{()->actionHandler.onActionXD()}"
+                android:text="获取场地下单"
                 app:layout_constraintBottom_toBottomOf="@+id/button2"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/button2" />
@@ -178,21 +178,10 @@
                 android:layout_marginStart="8dp"
                 android:layout_marginLeft="8dp"
                 android:layout_marginTop="8dp"
-                android:onClick="@{()->actionHandler.onAction1()}"
-                android:text="周二登录下单"
+                android:onClick="@{()->actionHandler.onActionLoginXD()}"
+                android:text="登录下单"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView4" />
-
-            <Button
-                android:id="@+id/button3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:onClick="@{()->actionHandler.onAction11()}"
-                android:text="周四登录下单"
-                app:layout_constraintBottom_toBottomOf="@+id/button2"
-                app:layout_constraintEnd_toStartOf="@+id/button"
-                app:layout_constraintStart_toEndOf="@+id/button2"
-                app:layout_constraintTop_toTopOf="@+id/button2" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>

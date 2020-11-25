@@ -7,7 +7,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.lcz.bm.databinding.ItemAdapterTxtBinding
-import com.lcz.bm.entity.ShowMsgEntity
 
 /**
  *
@@ -17,7 +16,7 @@ import com.lcz.bm.entity.ShowMsgEntity
  */
 class ShowMsgAdapter(
     private val lifecycleOwner: LifecycleOwner
-) : ListAdapter<ShowMsgEntity, ShowMsgViewHolder>(ShowMsgDiff) {
+) : ListAdapter<String, ShowMsgViewHolder>(ShowMsgDiff) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ShowMsgViewHolder {
         val binding =
             ItemAdapterTxtBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -34,18 +33,18 @@ class ShowMsgViewHolder(
     private val binding: ItemAdapterTxtBinding,
     private val lifecycleOwner: LifecycleOwner
 ) : RecyclerView.ViewHolder(binding.root) {
-    fun bind(entity: ShowMsgEntity) {
-        binding.entity = entity
+    fun bind(entity: String) {
+        binding.showMsg = entity
         binding.lifecycleOwner = lifecycleOwner
     }
 }
 
-object ShowMsgDiff : DiffUtil.ItemCallback<ShowMsgEntity>() {
-    override fun areItemsTheSame(oldItem: ShowMsgEntity, newItem: ShowMsgEntity): Boolean {
-        return oldItem.showMsg == newItem.showMsg
+object ShowMsgDiff : DiffUtil.ItemCallback<String>() {
+    override fun areItemsTheSame(oldItem: String, newItem: String): Boolean {
+        return oldItem == newItem
     }
 
-    override fun areContentsTheSame(oldItem: ShowMsgEntity, newItem: ShowMsgEntity): Boolean {
+    override fun areContentsTheSame(oldItem: String, newItem: String): Boolean {
         return oldItem == newItem
     }
 
