@@ -114,7 +114,7 @@ class BadmintonFragment : Fragment(), BadmintonActionHandler,
             val fieldList = data.fieldList
             for (element in fieldList) {//场地
                 for (i in element.priceList.indices) {
-                    if (i == 22) {
+                    if (i == element.priceList.size - 5) {
                         Log.d(
                             "observe",
                             "index i- " + i + " 场地号 id- " + element.id + " 时间段 id- " + element.priceList[i].id + " " + element.priceList[i].startTime + " " + element.priceList[i].status
