@@ -80,7 +80,7 @@ class BadmintonFragment : Fragment(), BadmintonActionHandler,
         prefs.password = "meng520"
 //        prefs.phone = "18925287073"
 //        prefs.password = "412430"
-        binding.phone = "当前账号："+prefs.phone
+        binding.phone = "当前账号：" + prefs.phone
         if (dateFormatterUtil.getCurrentTimeLong() > dateFormatterUtil.getAutoSelectTImeLong()) {
             isStartNet = true
             subscribeRecyclerUI("超过抢订时间")
@@ -113,13 +113,10 @@ class BadmintonFragment : Fragment(), BadmintonActionHandler,
             val data = placeList[0]
             val fieldList = data.fieldList
             for (element in fieldList) {//场地
-                for (i in element.priceList.indices) {
-                    if (i == element.priceList.size - 5) {
-                        Log.d(
-                            "observe",
-                            "index i- " + i + " 场地号 id- " + element.id + " 时间段 id- " + element.priceList[i].id + " " + element.priceList[i].startTime + " " + element.priceList[i].status
-                        )
-                        if (element.priceList[i].status == "0") {
+                for ((index, item) in element.priceList.withIndex()) {
+                    if (index == element.priceList.size - 5) {
+                        Log.d("TAG", element.id.toString() + " " + index.toString() + " " + item)
+                        if (item.status == "0") {
                             if (mSelectFPList.size >= 2) {
                                 isGetNetData = true
                                 //场地选择成功
@@ -131,7 +128,7 @@ class BadmintonFragment : Fragment(), BadmintonActionHandler,
                                 mSelectFPList.add(
                                     SelectFieldPlaceEntity(
                                         fieldId = element.id,
-                                        placeId = element.priceList[i].id
+                                        placeId = item.id
                                     )
                                 )
                             }
@@ -147,9 +144,7 @@ class BadmintonFragment : Fragment(), BadmintonActionHandler,
                                 }
                             }
                         }
-
                     }
-
                 }
             }
         })
